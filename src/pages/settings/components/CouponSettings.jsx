@@ -25,7 +25,7 @@ export default function CouponSettings() {
   const fetchCoupons = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/cart/list-coupon");
+      const res = await api.get("/admin-dashboard/cart/list-coupon");
       setCoupons(res.data.data || []);
     } catch (err) {
       console.error("Fetch coupons failed");
@@ -76,10 +76,10 @@ export default function CouponSettings() {
     try {
       if (editId && editId !== "new") {
         // ✅ UPDATE COUPON
-        await api.put(`/cart/update-coupon/${editId}`, form);
+        await api.put(`/admin-dashboard/cart/update-coupon/${editId}`, form);
       } else {
         // ✅ CREATE COUPON
-        await api.post("/cart/create-coupon", form);
+        await api.post("/admin-dashboard/cart/create-coupon", form);
       }
 
       handleCancel();
@@ -94,7 +94,7 @@ export default function CouponSettings() {
     if (!confirm("Delete this coupon?")) return;
 
     try {
-      await api.delete(`/cart/delete-coupon/${id}`);
+      await api.delete(`/admin-dashboard/cart/delete-coupon/${id}`);
       fetchCoupons();
     } catch {
       alert("Delete failed");
