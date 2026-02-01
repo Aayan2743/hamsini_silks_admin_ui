@@ -1,13 +1,8 @@
-
-
-
 import { useState, useEffect } from "react";
-
 
 import api from "../../api/axios";
 import BrandDrawer from "./BrandDrawer";
 import useDynamicTitle from "../../hooks/useDynamicTitle";
-
 
 export default function Brands() {
   useDynamicTitle("Brands");
@@ -23,7 +18,7 @@ export default function Brands() {
   /* 📄 FETCH BRANDS */
   const fetchBrands = async () => {
     try {
-      const res = await api.get("/dashboard/get-brands", {
+      const res = await api.get("/admin-dashboard/list-brand", {
         params: { search, page, perPage },
       });
       setBrands(res.data.data);
@@ -40,7 +35,7 @@ export default function Brands() {
   /* 🗑 DELETE */
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this brand?")) return;
-    await api.delete(`/dashboard/delete-brand/${id}`);
+    await api.delete(`/admin-dashboard/delete-brand/${id}`);
     fetchBrands();
   };
 
@@ -81,28 +76,44 @@ export default function Brands() {
               <th className="px-4 py-3 text-left">Image</th>
               <th className="px-4 py-3 text-left">Brand Name</th>
               <th className="px-4 py-3 text-left">Action</th>
+              <th className="px-4 py-3 text-left">Status</th>
             </tr>
           </thead>
 
           <tbody>
             {brands.map((b) => (
-              <tr key={b.id} className="border-t">
-                <td className="px-4 py-3">
+              <tr key={b.id} className="border-t hover:bg-gray-50 transition">
+                <td className="px-4 py-4">
                   {b.full_image_url ? (
                     <img
                       src={b.full_image_url}
-                      className="w-12 h-12 rounded-lg object-cover border"
+                      className="w-12 h-12 rounded-xl object-cover border"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-lg bg-gray-100 border flex items-center justify-center text-xs text-gray-400">
-                      No Image
+                    <div className="w-12 h-12 rounded-xl bg-indigo-50 border flex items-center justify-center text-indigo-600 font-semibold text-sm">
+                      {b.name.charAt(0)}
                     </div>
                   )}
                 </td>
 
-                <td className="px-4 py-3 font-medium">{b.name}</td>
+                <td className="px-4 py-4">
+                  <p className="font-medium">{b.name}</p>
+                  <p className="text-xs text-gray-400">Brand</p>
+                </td>
 
-                <td className="px-4 py-3 space-x-4">
+                <td className="px-4 py-4">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      b.status === "active"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-gray-200 text-gray-600"
+                    }`}
+                  >
+                    {b.status}
+                  </span>
+                </td>
+
+                <td className="px-4 py-4 space-x-4">
                   <button
                     onClick={() => {
                       setEditData(b);
@@ -125,7 +136,7 @@ export default function Brands() {
 
             {brands.length === 0 && (
               <tr>
-                <td colSpan="3" className="text-center py-10 text-gray-500">
+                <td colSpan="3" className="text-center py-12 text-gray-500">
                   No brands found
                 </td>
               </tr>
@@ -167,9 +178,7 @@ export default function Brands() {
               key={i}
               onClick={() => setPage(i + 1)}
               className={`px-3 py-1 border rounded ${
-                page === i + 1
-                  ? "bg-indigo-600 text-white"
-                  : ""
+                page === i + 1 ? "bg-indigo-600 text-white" : ""
               }`}
             >
               {i + 1}

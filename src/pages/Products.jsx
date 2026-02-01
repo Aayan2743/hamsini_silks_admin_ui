@@ -1,7 +1,3 @@
-
-
-
-
 import { useEffect, useMemo, useState } from "react";
 import api from "../api/axios";
 import AddProductDrawer from "./components/AddProductDrawer";
@@ -32,7 +28,7 @@ export default function Products() {
     try {
       setLoading(true);
 
-      const res = await api.get("/dashboard/product/products", {
+      const res = await api.get("/admin-dashboard/products", {
         params: {
           search: query,
           page,
@@ -48,9 +44,6 @@ export default function Products() {
       setLoading(false);
     }
   };
-
-
-
 
   /* ================= LOAD ON CHANGE ================= */
 
@@ -119,35 +112,34 @@ export default function Products() {
             {!loading &&
               products.map((p) => (
                 <tr key={p.id} className="border-t hover:bg-gray-50">
-                     <td className="px-4 py-3 font-medium">{p.id}</td>
+                  <td className="px-4 py-3 font-medium">{p.id}</td>
                   <td className="px-4 py-3">
-  {p.image_url ? (
-    <img
-      src={p.image_url}
-      alt={p.name}
-      className="w-12 h-12 rounded-lg object-cover border"
-      onError={(e) => {
-        e.target.src = "/no-image.png"; // optional fallback
-      }}
-    />
-  ) : (
-    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-400">
-      No Image
-    </div>
-  )}
-</td>
+                    {p.image_url ? (
+                      <img
+                        src={p.image_url}
+                        alt={p.name}
+                        className="w-12 h-12 rounded-lg object-cover border"
+                        onError={(e) => {
+                          e.target.src = "/no-image.png"; // optional fallback
+                        }}
+                      />
+                    ) : (
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-400">
+                        No Image
+                      </div>
+                    )}
+                  </td>
                   <td className="px-4 py-3 font-medium">{p.name}</td>
-                  <td className="px-4 py-3">{p.category?.name || "-"}</td>
+                  <td className="px-4 py-3">{p.category_name?.name || "-"}</td>
                   <td className="px-4 py-3">{p.brand?.name || "-"}</td>
                   <td className="px-4 py-3">₹{p.base_price}</td>
                   <td className="px-4 py-3">
-
-                       <StatusBadge status={p.status} />
+                    <StatusBadge status={p.status} />
                   </td>
-                  
-                <td>
-                   <button
-                      type="button"   // ✅ THIS IS THE FIX
+
+                  <td>
+                    <button
+                      type="button" // ✅ THIS IS THE FIX
                       onClick={() => {
                         setSelectedProduct(p);
                         setOpenEdit(true);
@@ -156,9 +148,7 @@ export default function Products() {
                     >
                       Edit {p.id}
                     </button>
- 
-                </td>
-
+                  </td>
                 </tr>
               ))}
 
@@ -237,15 +227,15 @@ export default function Products() {
       />
 
       <EditProductDrawer
-          open={openEdit}
-          product={selectedProduct}      // FULL PRODUCT
-          productId={selectedProduct?.id}
-          onClose={() => {
-            setOpenEdit(false);
-            setSelectedProduct(null);
-            fetchProducts();
-          }}
-        />
+        open={openEdit}
+        product={selectedProduct} // FULL PRODUCT
+        productId={selectedProduct?.id}
+        onClose={() => {
+          setOpenEdit(false);
+          setSelectedProduct(null);
+          fetchProducts();
+        }}
+      />
     </div>
   );
 }
