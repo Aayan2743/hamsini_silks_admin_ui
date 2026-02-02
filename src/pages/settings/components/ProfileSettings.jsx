@@ -218,7 +218,7 @@ export default function ProfileSettings() {
 
   const { profile, getProfile, updateProfile, removeAvatar } =
     useProfile();
-
+console.log("test",getProfile)
   const [editMode, setEditMode] = useState(false);
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
   const [avatarFile, setAvatarFile] = useState(null);
@@ -246,11 +246,13 @@ export default function ProfileSettings() {
       password: "",
     });
 
-    setAvatar(
-      profile?.avatar
-        ? `${AVATAR_BASE_URL}/${profile.avatar}`
-        : DEFAULT_AVATAR
-    );
+    // setAvatar(
+    //   profile?.avatar
+    //     ? `${AVATAR_BASE_URL}/${profile.avatar}`
+    //     : DEFAULT_AVATAR
+    // );
+
+    setAvatar(DEFAULT_AVATAR)
   }, [profile]);
 
   /* ---------------- HANDLERS ---------------- */
