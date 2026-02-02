@@ -58,13 +58,16 @@ import OrderDetail from "./pages/OrderDetail";
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyOtp from "./pages/VerifyOtp";
 import ResetPassword from "./pages/ResetPassword";
+import { ProfileProvider } from "./context/ProfileContext";
+
 
 // import SettingsPage from "./pages/settings/SettingsPage";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Toaster position="top-right" reverseOrder={false} />
+      <ProfileProvider>
+         <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         {/* ---------------- PUBLIC ---------------- */}
         <Route
@@ -198,6 +201,7 @@ export default function App() {
         {/* ---------------- FALLBACK ---------------- */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
+      </ProfileProvider>
     </BrowserRouter>
   );
 }
