@@ -26,7 +26,6 @@ export const LogoSettingsProvider = ({ children }) => {
       if (!silent) setLoading(false);
     }
   };
-
   /* -------- UPDATE LOGO SETTINGS -------- */
   const updateLogoSettings = async (formData) => {
     try {

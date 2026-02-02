@@ -197,15 +197,19 @@
 //   );
 // }
 
+
+
 import { useEffect, useState } from "react";
 import SettingsLayout from "../SettingsLayout";
 import useDynamicTitle from "../../../hooks/useDynamicTitle";
 import { useLogoSettings } from "../../../context/LogoSettingsContext";
-import defaultImage from "../../../assets/profile.jpg"
+import defaultImage from "../../../assets/profile.jpg";
 
 const DEFAULT_LOGO = defaultImage;
 const DEFAULT_FAVICON = defaultImage;
 
+// const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL= "http://192.168.1.6:8000/storage/"
 export default function LogoSettings() {
   useDynamicTitle("Logo Settings");
 
@@ -215,8 +219,8 @@ export default function LogoSettings() {
   const [editMode, setEditMode] = useState(false);
 
   const [appName, setAppName] = useState("");
-  const [logo, setLogo] = useState(defaultImage);
-  const [favicon, setFavicon] = useState(defaultImage);
+  const [logo, setLogo] = useState(DEFAULT_LOGO);
+  const [favicon, setFavicon] = useState(DEFAULT_FAVICON);
 
   const [logoFile, setLogoFile] = useState(null);
   const [faviconFile, setFaviconFile] = useState(null);
@@ -231,8 +235,18 @@ export default function LogoSettings() {
     if (!settings) return;
 
     setAppName(settings.app_name ?? "");
-    setLogo(settings.app_logo || DEFAULT_LOGO);
-    setFavicon(settings.app_favicon || DEFAULT_FAVICON);
+
+    setLogo(
+      settings.app_logo
+        ? `${BASE_URL}${settings.app_logo}?t=${settings.updated_at || Date.now()}`
+        : DEFAULT_LOGO
+    );
+
+    setFavicon(
+      settings.app_favicon
+        ? `${BASE_URL}${settings.app_favicon}?t=${settings.updated_at || Date.now()}`
+        : DEFAULT_FAVICON
+    );
   }, [settings]);
 
   /* ---------------- IMAGE HANDLER ---------------- */
@@ -382,4 +396,3 @@ export default function LogoSettings() {
     </SettingsLayout>
   );
 }
-
