@@ -1,4 +1,8 @@
+// import { useRef } from "react";
+
 // export default function VariantTable({ variants, data, setData }) {
+//   const fileRefs = useRef({});
+
 //   const update = (i, field, value) => {
 //     setData((prev) => {
 //       const copy = [...prev];
@@ -61,71 +65,77 @@
 //             {variants.map((v, i) => (
 //               <tr key={i} className="border-t align-top">
 //                 {/* VARIANT LABEL */}
-//                 <td className="px-3 py-2 font-medium">
+//                 <td className="px-3 py-2 font-medium whitespace-nowrap">
 //                   {v.join(" / ")}
 //                 </td>
 
 //                 {/* EXTRA PRICE */}
 //                 <td className="px-3 py-2">
 //                   <input
-//                     className="input"
 //                     type="number"
+//                     className="mini-input"
 //                     placeholder="0"
 //                     value={data[i]?.price || ""}
-//                     onChange={(e) =>
-//                       update(i, "price", e.target.value)
-//                     }
+//                     onChange={(e) => update(i, "price", e.target.value)}
 //                   />
 //                 </td>
 
 //                 {/* SKU */}
 //                 <td className="px-3 py-2">
 //                   <input
-//                     className="input"
+//                     className="mini-input w-24"
 //                     placeholder="SKU"
 //                     value={data[i]?.sku || ""}
-//                     onChange={(e) =>
-//                       update(i, "sku", e.target.value)
-//                     }
+//                     onChange={(e) => update(i, "sku", e.target.value)}
 //                   />
 //                 </td>
 
 //                 {/* QTY */}
 //                 <td className="px-3 py-2">
 //                   <input
-//                     className="input"
 //                     type="number"
-//                     placeholder="Qty"
+//                     className="mini-input"
+//                     placeholder="0"
 //                     value={data[i]?.qty || ""}
-//                     onChange={(e) =>
-//                       update(i, "qty", e.target.value)
-//                     }
+//                     onChange={(e) => update(i, "qty", e.target.value)}
 //                   />
 //                 </td>
 
 //                 {/* LOW QTY */}
 //                 <td className="px-3 py-2">
 //                   <input
-//                     className="input"
 //                     type="number"
-//                     placeholder="Low Qty"
+//                     className="mini-input"
+//                     placeholder="0"
 //                     value={data[i]?.low_qty || ""}
-//                     onChange={(e) =>
-//                       update(i, "low_qty", e.target.value)
-//                     }
+//                     onChange={(e) => update(i, "low_qty", e.target.value)}
 //                   />
 //                 </td>
 
 //                 {/* IMAGES */}
 //                 <td className="px-3 py-2">
 //                   <input
+//                     ref={(el) => (fileRefs.current[i] = el)}
 //                     type="file"
 //                     multiple
 //                     accept="image/*"
-//                     onChange={(e) =>
-//                       addImages(i, e.target.files)
-//                     }
+//                     hidden
+//                     onChange={(e) => addImages(i, e.target.files)}
 //                   />
+
+//                   <button
+//                     type="button"
+//                     onClick={() => fileRefs.current[i]?.click()}
+//                     className="upload-btn"
+//                   >
+//                     Upload
+//                   </button>
+
+//                   {data[i]?.images?.length > 0 && (
+//                     <span className="ml-2 text-xs text-gray-500">
+//                       {data[i].images.length} file(s)
+//                     </span>
+//                   )}
 
 //                   {/* IMAGE PREVIEW */}
 //                   {data[i]?.images?.length > 0 && (
@@ -136,22 +146,19 @@
 //                         return (
 //                           <div
 //                             key={idx}
-//                             className="relative h-14 w-14 border rounded overflow-hidden"
+//                             className="relative h-14 w-14 rounded-lg border overflow-hidden"
 //                           >
 //                             <img
 //                               src={preview}
 //                               alt=""
 //                               className="h-full w-full object-cover"
-//                               onLoad={() =>
-//                                 URL.revokeObjectURL(preview)
-//                               }
+//                               onLoad={() => URL.revokeObjectURL(preview)}
 //                             />
 //                             <button
 //                               type="button"
-//                               onClick={() =>
-//                                 removeImage(i, idx)
-//                               }
-//                               className="absolute top-0 right-0 bg-black/70 text-white text-xs px-1"
+//                               onClick={() => removeImage(i, idx)}
+//                               className="absolute top-0 right-0
+//                                 bg-black/70 text-white text-xs px-1"
 //                             >
 //                               ✕
 //                             </button>
@@ -217,7 +224,7 @@ export default function VariantTable({ variants, data, setData }) {
     <div className="border rounded-xl bg-white p-6">
       <h4 className="font-semibold mb-1">Generated Variants</h4>
       <p className="text-sm text-gray-500 mb-4">
-        Configure per-variant price, SKU, stock and images.
+        Configure per-variant price, purchase price, SKU, stock and images.
       </p>
 
       <div className="overflow-x-auto">
@@ -225,13 +232,14 @@ export default function VariantTable({ variants, data, setData }) {
           <thead className="bg-gray-50 text-gray-600">
             <tr>
               <th className="px-3 py-2 text-left">Variant</th>
-              <th className="px-3 py-2">Extra Price</th>
+              <th className="px-3 py-2">Purchase Price</th>
+              <th className="px-3 py-2">Selling Price</th>
               <th className="px-3 py-2">SKU</th>
               <th className="px-3 py-2">Qty</th>
               <th className="px-3 py-2">Low Qty</th>
               <th className="px-3 py-2">Photos</th>
             </tr>
-          </thead>
+          </thead>  
 
           <tbody>
             {variants.map((v, i) => (
@@ -239,6 +247,19 @@ export default function VariantTable({ variants, data, setData }) {
                 {/* VARIANT LABEL */}
                 <td className="px-3 py-2 font-medium whitespace-nowrap">
                   {v.join(" / ")}
+                </td>
+
+                {/* PURCHASE PRICE */}
+                <td className="px-3 py-2">
+                  <input
+                    type="number"
+                    className="mini-input"
+                    placeholder="0"
+                    value={data[i]?.purchase_price || ""}
+                    onChange={(e) =>
+                      update(i, "purchase_price", e.target.value)
+                    }
+                  />
                 </td>
 
                 {/* EXTRA PRICE */}

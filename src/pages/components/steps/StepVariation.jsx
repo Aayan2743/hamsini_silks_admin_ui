@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import api from "../../../api/axios";
 
@@ -16,9 +14,9 @@ const StepVariation = forwardRef(({ productId }, ref) => {
 
   /* ================= LOAD VARIATIONS ================= */
 
-  const loadVariations = () => {
+  useEffect(() => {
     api
-      .get("/dashboard/get-variations")
+      .get("/admin-dashboard/get-variations")
       .then((res) => {
         const raw = res.data.data || [];
 
@@ -26,7 +24,7 @@ const StepVariation = forwardRef(({ productId }, ref) => {
           id: v.id,
           name: v.name,
           type: v.type,
-          values: (v.variation_values || []).map((val) => ({
+          values: (v.values || []).map((val) => ({
             id: val.id,
             value: val.value,
             color_code: val.color_code,
@@ -40,10 +38,6 @@ const StepVariation = forwardRef(({ productId }, ref) => {
         setSelected(init);
       })
       .catch(() => alert("Failed to load variations"));
-  };
-
-  useEffect(() => {
-    loadVariations();
   }, []);
 
   /* ================= HANDLE SELECT ================= */
@@ -77,7 +71,69 @@ const StepVariation = forwardRef(({ productId }, ref) => {
     setVariantData((prev) => combos.map((_, i) => prev[i] || {}));
   }, [selected, variations]);
 
-  /* ================= SAVE STEP ================= */
+  /* ================= SAVE STEP (API INTEGRATION) ================= */
+
+  // useImperativeHandle(ref, () => ({
+  //   async saveStep() {
+  //     if (!productId) {
+  //       alert("Product not created");
+  //       return false;
+  //     }
+
+  //     if (!variants.length) return true;
+
+  //     try {
+  //       setLoading(true);
+
+  //       // ✅ BUILD PAYLOAD FOR API
+  //       const payload = variants.map((label, i) => ({
+  //         variation_value_ids: Object.values(selected)
+  //           .flat()
+  //           .filter((v) => label.includes(v.value))
+  //           .map((v) => v.id),
+
+  //         sku: variantData[i]?.sku || null,
+  //         purchase_price: variantData[i]?.purchase_price || 0, // ✅ NEW
+  //         extra_price: variantData[i]?.price || 0,
+  //         quantity: variantData[i]?.qty || 0,
+  //         low_quantity: variantData[i]?.low_qty || 0,
+  //       }));
+
+  //       // ✅ CREATE VARIANTS
+  //       const res = await api.post(
+  //         `/admin-dashboard/product/create-variation/${productId}`,
+  //         { variants: payload },
+  //       );
+
+  //       const createdVariants = res.data.data || [];
+
+  //       // ✅ UPLOAD VARIANT IMAGES
+  //       for (let i = 0; i < createdVariants.length; i++) {
+  //         const images = variantData[i]?.images;
+  //         if (!images?.length) continue;
+
+  //         const fd = new FormData();
+  //         images.forEach((img) => fd.append("images[]", img));
+
+  //         await api.post(
+  //           `/admin-dashboard/product/variant/${createdVariants[i].id}/ `,
+  //           fd,
+  //           {
+  //             headers: { "Content-Type": "multipart/form-data" },
+  //           },
+  //         );
+  //       }
+
+  //       return true;
+  //     } catch (err) {
+  //       console.error(err);
+  //       alert("Failed to save variants");
+  //       return false;
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   },
+  // }));
 
   useImperativeHandle(ref, () => ({
     async saveStep() {
@@ -91,6 +147,7 @@ const StepVariation = forwardRef(({ productId }, ref) => {
       try {
         setLoading(true);
 
+        // 1️⃣ BUILD VARIANTS PAYLOAD
         const payload = variants.map((label, i) => ({
           variation_value_ids: Object.values(selected)
             .flat()
@@ -98,33 +155,34 @@ const StepVariation = forwardRef(({ productId }, ref) => {
             .map((v) => v.id),
 
           sku: variantData[i]?.sku || null,
-          extra_price: variantData[i]?.price || 0,
-          quantity: variantData[i]?.qty || 0,
-          low_quantity: variantData[i]?.low_qty || 0,
+          purchase_price: Number(variantData[i]?.purchase_price || 0),
+          extra_price: Number(variantData[i]?.price || 0),
+          quantity: Number(variantData[i]?.qty || 0),
+          low_quantity: Number(variantData[i]?.low_qty || 0),
         }));
 
-        const res = await api.post(
-          `/dashboard/product/create-variation/${productId}`,
-          { variants: payload }
+        // 2️⃣ FORM DATA (JSON + IMAGES)
+        const fd = new FormData();
+        fd.append("variants", JSON.stringify(payload));
+
+        variantData.forEach((row, index) => {
+          row?.images?.forEach((img) => {
+            fd.append(`variant_images[${index}][]`, img);
+          });
+        });
+
+        // 3️⃣ SINGLE API CALL
+        await api.post(
+          `/admin-dashboard/product/create-variation/${productId}`,
+          fd,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          },
         );
-
-        const createdVariants = res.data.data || [];
-
-        for (let i = 0; i < createdVariants.length; i++) {
-          const images = variantData[i]?.images;
-          if (!images?.length) continue;
-
-          const fd = new FormData();
-          images.forEach((img) => fd.append("images", img));
-
-          await api.post(
-            `/dashboard/product/variant/${createdVariants[i].id}/images`,
-            fd
-          );
-        }
 
         return true;
       } catch (err) {
+        console.error(err);
         alert("Failed to save variants");
         return false;
       } finally {
@@ -148,13 +206,11 @@ const StepVariation = forwardRef(({ productId }, ref) => {
           </p>
         </div>
 
-        {/* QUICK ADD VARIATION */}
         <a
           href="/dashboard/settings/variations"
           target="_blank"
           rel="noreferrer"
-          className="px-4 py-2 rounded-lg border text-sm
-          hover:bg-gray-50 transition"
+          className="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50"
         >
           + Add Variation
         </a>
@@ -182,14 +238,6 @@ const StepVariation = forwardRef(({ productId }, ref) => {
             data={variantData}
             setData={setVariantData}
           />
-        </div>
-      )}
-
-      {/* EMPTY STATE */}
-      {variations.length > 0 && variations.every((v) => !v.values?.length) && (
-        <div className="rounded-lg border border-dashed p-4 text-center text-sm text-gray-500">
-          No variation values found. Add values from{" "}
-          <strong>Variation Settings</strong>.
         </div>
       )}
 

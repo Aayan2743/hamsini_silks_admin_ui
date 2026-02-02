@@ -43,10 +43,14 @@ export default function AddProductDrawer({ open, onClose }) {
         if (!(await variationRef.current.saveStep())) return;
       }
 
+      if (step === 4 && metaRef.current) {
+        if (!(await metaRef.current.saveStep())) return;
+      }
+
       if (step === 5 && taxRef.current) {
         if (!(await taxRef.current.saveStep())) return;
 
-        await api.post(`/dashboard/product/${productId}/publish`);
+        await api.post(`/admin-dashboard/publish-product/${productId}`);
 
         // toast.success("Product published successfully 🎉");
 

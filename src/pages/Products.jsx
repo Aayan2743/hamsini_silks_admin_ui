@@ -130,8 +130,8 @@ export default function Products() {
                     )}
                   </td>
                   <td className="px-4 py-3 font-medium">{p.name}</td>
-                  <td className="px-4 py-3">{p.category_name?.name || "-"}</td>
-                  <td className="px-4 py-3">{p.brand?.name || "-"}</td>
+                  <td className="px-4 py-3">{p.category_name || "-"}</td>
+                  <td className="px-4 py-3">{p.brand_name || "-"}</td>
                   <td className="px-4 py-3">₹{p.base_price}</td>
                   <td className="px-4 py-3">
                     <StatusBadge status={p.status} />
