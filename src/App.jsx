@@ -44,7 +44,7 @@ import SettingsPage from "./pages/settings/SettingsPage";
 import SocialMediaSettings from "./pages/settings/components/SocialMediaSettings";
 import PaymentGatewaySettings from "./pages/settings/components/PaymentGatewaySettings";
 import ProfileSettings from "./pages/settings/components/ProfileSettings";
-import LogoSettings from "./pages/settings/components/LogoSettings";
+// import LogoSettings from "./pages/settings/components/LogoSettings";
 import VariationSettings from "./pages/settings/components/VariationSettings";
 import WhatsAppIntegrationSettings from "./pages/settings/components/WhatsAppIntegrationSettings";
 import AccountSettings from "./pages/settings/components/AccountSettings";
@@ -58,7 +58,10 @@ import OrderDetail from "./pages/OrderDetail";
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyOtp from "./pages/VerifyOtp";
 import ResetPassword from "./pages/ResetPassword";
+import { LogoSettingsProvider } from "./context/LogoSettingsContext";
 import { ProfileProvider } from "./context/ProfileContext";
+import LogoSettings from "./pages/settings/components/LogoSettings";
+
 
 
 // import SettingsPage from "./pages/settings/SettingsPage";
@@ -66,6 +69,7 @@ import { ProfileProvider } from "./context/ProfileContext";
 export default function App() {
   return (
     <BrowserRouter>
+    <LogoSettingsProvider>
       <ProfileProvider>
          <Toaster position="top-right" reverseOrder={false} />
       <Routes>
@@ -202,6 +206,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
       </ProfileProvider>
+      </LogoSettingsProvider>
     </BrowserRouter>
   );
 }

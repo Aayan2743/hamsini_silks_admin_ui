@@ -15,7 +15,7 @@ export const AppSettingsProvider = ({ children }) => {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const res = await api.get("/admin-dashboard/app-logo-settings");
+        const res = await api.get("/auth/app-logo-settings");
 
         if (res.data?.status) {
           setSettings({
