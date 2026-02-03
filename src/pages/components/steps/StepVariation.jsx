@@ -156,7 +156,9 @@ const StepVariation = forwardRef(({ productId }, ref) => {
 
           sku: variantData[i]?.sku || null,
           purchase_price: Number(variantData[i]?.purchase_price || 0),
-          extra_price: Number(variantData[i]?.price || 0),
+          // extra_price: Number(variantData[i]?.price || 0),
+          sell_price: Number(variantData[i]?.price || 0),
+          discount: Number(variantData[i]?.discount || 0),
           quantity: Number(variantData[i]?.qty || 0),
           low_quantity: Number(variantData[i]?.low_qty || 0),
         }));

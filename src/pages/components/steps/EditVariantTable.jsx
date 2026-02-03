@@ -1,6 +1,6 @@
 export default function EditVariantTable({
   variants,
-  data,
+  data = [],
   setData,
   removeImage,
   addImages,
@@ -13,50 +13,22 @@ export default function EditVariantTable({
     });
   };
 
-  // const addImages = (index, files) => {
-  //   const newFiles = Array.from(files);
+  if (!Array.isArray(data) || data.length === 0) {
+    return (
+      <div className="text-sm text-gray-500 text-center py-6">
+        No variants generated
+      </div>
+    );
+  }
 
-  //   setData((prev) => {
-  //     const copy = [...prev];
-  //     copy[index] = {
-  //       ...copy[index],
-  //       images: [...(copy[index].images || []), ...newFiles],
-  //     };
-  //     return copy;
-  //   });
-  // };
-
-  // const removeImage = (rowIndex, imgIndex) => {
-  //   setData((prev) => {
-  //     const copy = [...prev];
-  //     const imgs = [...(copy[rowIndex].images || [])];
-  //     imgs.splice(imgIndex, 1);
-  //     copy[rowIndex] = { ...copy[rowIndex], images: imgs };
-  //     return copy;
-  //   });
-  // };
-
-  // const addImages = (rowIndex, files) => {
-  //   setRows((prev) =>
-  //     prev.map((row, i) =>
-  //       i === rowIndex
-  //         ? {
-  //             ...row,
-  //             images: [...row.images, ...files],
-  //             imagesTouched: true, // 🔴 IMPORTANT
-  //           }
-  //         : row
-  //     )
-  //   );
-  // };
-
+  console.log("ssssss", data);
   return (
     <div className="border rounded-xl bg-white shadow-sm">
       {/* HEADER */}
       <div className="px-5 py-3 border-b">
         <h4 className="font-semibold text-gray-800">Generated Variants</h4>
         <p className="text-sm text-gray-500">
-          Configure SKU, pricing, inventory and images per variant
+          Configure pricing, inventory and images per variant
         </p>
       </div>
 
@@ -66,7 +38,9 @@ export default function EditVariantTable({
           <thead className="bg-gray-50 text-gray-600">
             <tr>
               <th className="px-3 py-2 text-left">Variant</th>
-              <th className="px-3 py-2">Price</th>
+              <th className="px-3 py-2">Purchase Price</th>
+              <th className="px-3 py-2">Selling Price</th>
+              <th className="px-3 py-2">Discount (%)</th>
               <th className="px-3 py-2">SKU</th>
               <th className="px-3 py-2">Qty</th>
               <th className="px-3 py-2">Low Qty</th>
@@ -76,19 +50,48 @@ export default function EditVariantTable({
 
           <tbody>
             {data.map((row, rowIndex) => (
-              <tr key={row.key} className="border-t align-top hover:bg-gray-50">
-                {/* LABEL */}
+              <tr
+                key={row.key || rowIndex}
+                className="border-t align-top hover:bg-gray-50"
+              >
+                {/* VARIANT LABEL */}
                 <td className="px-3 py-2 font-medium whitespace-nowrap">
                   {row.label}
                 </td>
 
-                {/* PRICE */}
+                {/* PURCHASE PRICE */}
                 <td className="px-3 py-2">
                   <input
                     type="number"
                     className="w-24 border rounded px-2 py-1"
-                    value={row.price}
-                    onChange={(e) => update(rowIndex, "price", e.target.value)}
+                    value={row.purchase_price ?? ""}
+                    onChange={(e) =>
+                      update(rowIndex, "purchase_price", e.target.value)
+                    }
+                  />
+                </td>
+
+                {/* SELLING PRICE */}
+                <td className="px-3 py-2">
+                  <input
+                    type="number"
+                    className="w-24 border rounded px-2 py-1"
+                    value={row.extra_price ?? ""}
+                    onChange={(e) =>
+                      update(rowIndex, "selling_price", e.target.value)
+                    }
+                  />
+                </td>
+
+                {/* DISCOUNT */}
+                <td className="px-3 py-2">
+                  <input
+                    type="number"
+                    className="w-20 border rounded px-2 py-1"
+                    value={row.discount ?? ""}
+                    onChange={(e) =>
+                      update(rowIndex, "discount", e.target.value)
+                    }
                   />
                 </td>
 
@@ -96,7 +99,7 @@ export default function EditVariantTable({
                 <td className="px-3 py-2">
                   <input
                     className="w-32 border rounded px-2 py-1"
-                    value={row.sku}
+                    value={row.sku ?? ""}
                     onChange={(e) => update(rowIndex, "sku", e.target.value)}
                   />
                 </td>
@@ -106,7 +109,7 @@ export default function EditVariantTable({
                   <input
                     type="number"
                     className="w-20 border rounded px-2 py-1"
-                    value={row.qty}
+                    value={row.qty ?? ""}
                     onChange={(e) => update(rowIndex, "qty", e.target.value)}
                   />
                 </td>
@@ -116,7 +119,7 @@ export default function EditVariantTable({
                   <input
                     type="number"
                     className="w-20 border rounded px-2 py-1"
-                    value={row.low_qty}
+                    value={row.low_qty ?? ""}
                     onChange={(e) =>
                       update(rowIndex, "low_qty", e.target.value)
                     }
@@ -134,14 +137,14 @@ export default function EditVariantTable({
                     }
                   />
 
-                  {row.images?.length > 0 && (
+                  {Array.isArray(row.images) && row.images.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
                       {row.images.map((img, idx) => {
                         const preview =
                           img instanceof File
-                            ? URL.createObjectURL(img) // new upload
-                            : img.image_url; // existing image (FULL URL)
-                        console.log("Preview URL:", preview);
+                            ? URL.createObjectURL(img)
+                            : img.image_url || img.url;
+
                         return (
                           <div
                             key={img.id || idx}

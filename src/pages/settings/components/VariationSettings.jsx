@@ -9,33 +9,6 @@ export default function VariationSettings() {
   /* ================= LOAD VARIATIONS ================= */
   // const loadVariations = async () => {
 
-  //   try {
-  //     const res = await api.get("/admin-dashboard/get-variations");
-
-  //     const normalized = (res.data.data || []).map((v) => ({
-  //       id: v.id,
-  //       name: v.name,
-  //       type: v.type,
-  //       values: (v.variation_values || []).map((val) =>
-  //         v.type === "color"
-  //           ? {
-  //               id: val.id,
-  //               label: val.value,
-  //               code: val.color_code || "#000000",
-  //             }
-  //           : {
-  //               id: val.id,
-  //               value: val.value,
-  //             },
-  //       ),
-  //     }));
-
-  //     setVariations(normalized);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
-
   const loadVariations = async () => {
     try {
       const res = await api.get("/admin-dashboard/get-variations");

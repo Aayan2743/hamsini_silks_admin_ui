@@ -86,7 +86,7 @@ export default function StepBasic({ setStep, setProductId }) {
   };
 
   const handleSubmit = async () => {
-    if (!form.name || !form.category_id || !form.base_price) {
+    if (!form.name || !form.category_id) {
       alert("Required fields missing");
       return;
     }
@@ -197,7 +197,7 @@ export default function StepBasic({ setStep, setProductId }) {
 
       {/* PRICES */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <FormGroup label="Price (₹)">
+        {/* <FormGroup label="Price (₹)">
           <input
             type="number"
             className="input"
@@ -216,17 +216,17 @@ export default function StepBasic({ setStep, setProductId }) {
           {priceError && (
             <p className="text-xs text-red-600 mt-1">{priceError}</p>
           )}
-        </FormGroup>
+        </FormGroup> */}
       </div>
 
-      <FormGroup label="Discount (₹)">
+      {/* <FormGroup label="Discount (₹)">
         <input
           type="number"
           className="input"
           value={form.discount}
           onChange={(e) => handleChange("discount", e.target.value)}
         />
-      </FormGroup>
+      </FormGroup> */}
 
       {/* ACTION */}
       <button
