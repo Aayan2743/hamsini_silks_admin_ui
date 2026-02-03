@@ -211,7 +211,7 @@ import DefaultAvatar from "../../../assets/profile.jpg";
 
 
 const DEFAULT_AVATAR = DefaultAvatar
-const AVATAR_BASE_URL = "http://localhost:8000/storage";
+const AVATAR_BASE_URL = import.meta.env.VITE_API_BASE_URL_Image_URl;
 
 export default function ProfileSettings() {
   useDynamicTitle("Profile Settings");
@@ -246,13 +246,13 @@ console.log("test",getProfile)
       password: "",
     });
 
-    // setAvatar(
-    //   profile?.avatar
-    //     ? `${AVATAR_BASE_URL}/${profile.avatar}`
-    //     : DEFAULT_AVATAR
-    // );
+    setAvatar(
+      profile?.avatar
+        ? `${AVATAR_BASE_URL}/${profile.avatar}`
+        : DEFAULT_AVATAR
+    );
 
-    setAvatar(DEFAULT_AVATAR)
+    // setAvatar(DEFAULT_AVATAR)
   }, [profile]);
 
   /* ---------------- HANDLERS ---------------- */
