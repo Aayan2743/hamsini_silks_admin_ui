@@ -27,7 +27,7 @@ export default function StepBasic({ setStep, setProductId }) {
     const fetchData = async () => {
       try {
         const [catRes, brandRes] = await Promise.all([
-          api.get("/admin-dashboard/list-category"),
+          api.get("/admin-dashboard/list-category-all"),
           api.get("/admin-dashboard/list-brand"),
         ]);
 
