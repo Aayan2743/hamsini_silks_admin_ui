@@ -131,7 +131,7 @@ import {
   Settings,
   Users,
 } from "lucide-react";
-
+import { useProfile } from "../context/ProfileContext";
 import api from "../api/axios";
 import { useAppSettings } from "../context/AppSettingsContext";
 import { useLogoSettings } from "../context/LogoSettingsContext";
@@ -143,7 +143,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL_Image_URl;
 
 export default function Sidebar({ open, setOpen, logout }) {
   const { settings } = useAppSettings();
-
+   const { showBrandName } = useProfile();
   const {
     settings: logoSettings,
     getLogoSettings,          // ✅ IMPORTANT
@@ -220,7 +220,10 @@ export default function Sidebar({ open, setOpen, logout }) {
           <Item to="/dashboard" icon={Home} label="Dashboard" />
           <Item to="/products" icon={Box} label="Products" />
           <Item to="/categories" icon={Tag} label="Category" />
-          <Item to="/brands" icon={Store} label="Brand" />
+          {/* <Item to="/brands" icon={Store} label="Brand" /> */}
+          {showBrandName && (
+  <Item to="/brands" icon={Store} label="Brand" />
+)}
           <Item to="/pos" icon={ShoppingCart} label="POS" />
           <Item to="/expenses" icon={DollarSign} label="Expenses" />
           <Item to="/orders" icon={Package} label="Orders" />

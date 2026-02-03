@@ -1,13 +1,20 @@
+
 // import { useEffect, useState } from "react";
 // import SettingsLayout from "../SettingsLayout";
-// import api from "../../../api/axios";
-
-// const DEFAULT_AVATAR = "/avatar-placeholder.png";
-
 // import useDynamicTitle from "../../../hooks/useDynamicTitle";
+// import { useProfile } from "../../../context/ProfileContext";
+// import DefaultAvatar from "../../../assets/profile.jpg";
+
+
+// const DEFAULT_AVATAR = DefaultAvatar
+// const AVATAR_BASE_URL = import.meta.env.VITE_API_BASE_URL_Image_URl;
 
 // export default function ProfileSettings() {
 //   useDynamicTitle("Profile Settings");
+
+//   const { profile, getProfile, updateProfile, removeAvatar } =
+//     useProfile();
+// console.log("test",getProfile)
 //   const [editMode, setEditMode] = useState(false);
 //   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
 //   const [avatarFile, setAvatarFile] = useState(null);
@@ -19,71 +26,74 @@
 //     password: "",
 //   });
 
-//   /* ---------------- GET PROFILE ---------------- */
-//   const fetchProfile = async () => {
-//     try {
-//       const res = await api.get("/dashboard/profile");
-
-//       const data = res.data.data;
-
-//       setForm({
-//         name: data.name || "",
-//         email: data.email || "",
-//         phone: data.phone || "",
-//         password: "",
-//       });
-//     console.log("data",data)
-//       setAvatar(data.avatar || DEFAULT_AVATAR);
-//     } catch (err) {
-//       console.error("Profile fetch failed", err);
-//     }
-//   };
-
+//   /* ---------------- LOAD PROFILE ---------------- */
 //   useEffect(() => {
-//     fetchProfile();
+//     getProfile();
 //   }, []);
+
+//   /* ---------------- MAP PROFILE → FORM ---------------- */
+//   useEffect(() => {
+//     if (!profile) return;
+
+//     setForm({
+//       name: profile.name ?? "",
+//       email: profile.email ?? "",
+//       phone: String(profile.phone ?? ""), // ensure string
+//       password: "",
+//     });
+
+//     setAvatar(
+//       profile?.avatar
+//         ? `${AVATAR_BASE_URL}/${profile.avatar}`
+//         : DEFAULT_AVATAR
+//     );
+
+//     // setAvatar(DEFAULT_AVATAR)
+//   }, [profile]);
 
 //   /* ---------------- HANDLERS ---------------- */
 //   const handleChange = (e) => {
-//     setForm({ ...form, [e.target.name]: e.target.value });
+//     setForm((prev) => ({
+//       ...prev,
+//       [e.target.name]: e.target.value,
+//     }));
 //   };
 
 //   const handleAvatarChange = (e) => {
-//     const file = e.target.files[0];
+//     const file = e.target.files?.[0];
 //     if (!file) return;
 
-//     setAvatar(URL.createObjectURL(file)); // preview
-//     setAvatarFile(file);                  // store file
+//     setAvatar(URL.createObjectURL(file));
+//     setAvatarFile(file);
 //   };
 
+//   /* ---------------- SAVE ---------------- */
 //   const handleSave = async () => {
-//     try {
-//       const formData = new FormData();
+//     const formData = new FormData();
 
-//       formData.append("name", form.name);
-//       formData.append("email", form.email);
-//       formData.append("phone", form.phone);
+//     formData.append("name", form.name);
+//     formData.append("email", form.email);
+//     formData.append("phone", form.phone);
 
-//       if (form.password) {
-//         formData.append("password", form.password);
-//       }
+//     if (form.password.trim().length > 0) {
+//       formData.append("password", form.password);
+//     }
 
-//       if (avatarFile) {
-//         formData.append("avatar", avatarFile); // MUST be avatar
-//       }
+//     if (avatarFile) {
+//       formData.append("avatar", avatarFile);
+//     }
 
-//       await api.put("/dashboard/update-profile", formData);
+//     const success = await updateProfile(formData);
 
+//     if (success) {
 //       setEditMode(false);
 //       setAvatarFile(null);
-//       fetchProfile(); // refresh profile
-
-//     } catch (err) {
-//       console.error("Update failed", err);
+//       setForm((prev) => ({ ...prev, password: "" }));
 //     }
 //   };
 
-//   const handleRemoveAvatar = () => {
+//   const handleRemoveAvatar = async () => {
+//     await removeAvatar();
 //     setAvatar(DEFAULT_AVATAR);
 //     setAvatarFile(null);
 //   };
@@ -124,39 +134,32 @@
 //         <div className="flex items-center gap-6">
 //           <div className="w-24 h-24 rounded-full border bg-gray-50 overflow-hidden flex items-center justify-center">
 //             <img
-//               src={avatar || DEFAULT_AVATAR}
+//               src={avatar}
 //               alt="Avatar"
 //               className="w-full h-full object-cover"
 //             />
 //           </div>
 
-//           <div className="space-y-2">
-//             <p className="text-sm font-medium">Profile Picture</p>
-//             <p className="text-xs text-gray-500">
-//               Recommended size: 256 × 256 px
-//             </p>
+//           {editMode && (
+//             <div className="flex gap-3">
+//               <label className="px-4 py-1.5 text-sm border rounded-lg cursor-pointer hover:bg-gray-50">
+//                 Upload
+//                 <input
+//                   type="file"
+//                   accept="image/*"
+//                   hidden
+//                   onChange={handleAvatarChange}
+//                 />
+//               </label>
 
-//             {editMode && (
-//               <div className="flex gap-3 mt-2">
-//                 <label className="px-4 py-1.5 text-sm border rounded-lg cursor-pointer hover:bg-gray-50">
-//                   Upload
-//                   <input
-//                     type="file"
-//                     accept="image/*"
-//                     hidden
-//                     onChange={handleAvatarChange}
-//                   />
-//                 </label>
-
-//                 <button
-//                   onClick={handleRemoveAvatar}
-//                   className="px-4 py-1.5 text-sm border text-red-600 rounded-lg hover:bg-red-50"
-//                 >
-//                   Remove
-//                 </button>
-//               </div>
-//             )}
-//           </div>
+//               <button
+//                 onClick={handleRemoveAvatar}
+//                 className="px-4 py-1.5 text-sm border text-red-600 rounded-lg hover:bg-red-50"
+//               >
+//                 Remove
+//               </button>
+//             </div>
+//           )}
 //         </div>
 
 //         <hr />
@@ -165,13 +168,13 @@
 //         <div className="space-y-5 text-sm">
 //           {["name", "email", "phone"].map((field) => (
 //             <div key={field}>
-//               <p className="font-medium">{field}</p>
+//               <p className="font-medium capitalize">{field}</p>
 //               {editMode ? (
 //                 <input
 //                   name={field}
 //                   value={form[field]}
 //                   onChange={handleChange}
-//                   className="mt-1 w-full border rounded-lg px-3 py-2 text-sm"
+//                   className="mt-1 w-full border rounded-lg px-3 py-2"
 //                 />
 //               ) : (
 //                 <p className="text-gray-500">{form[field]}</p>
@@ -190,7 +193,7 @@
 //                 value={form.password}
 //                 onChange={handleChange}
 //                 placeholder="New password"
-//                 className="mt-1 w-full border rounded-lg px-3 py-2 text-sm"
+//                 className="mt-1 w-full border rounded-lg px-3 py-2"
 //               />
 //             ) : (
 //               <p className="text-gray-500">••••••••</p>
@@ -203,22 +206,28 @@
 // }
 
 
+
 import { useEffect, useState } from "react";
 import SettingsLayout from "../SettingsLayout";
 import useDynamicTitle from "../../../hooks/useDynamicTitle";
 import { useProfile } from "../../../context/ProfileContext";
 import DefaultAvatar from "../../../assets/profile.jpg";
 
-
-const DEFAULT_AVATAR = DefaultAvatar
+const DEFAULT_AVATAR = DefaultAvatar;
 const AVATAR_BASE_URL = import.meta.env.VITE_API_BASE_URL_Image_URl;
 
 export default function ProfileSettings() {
   useDynamicTitle("Profile Settings");
 
-  const { profile, getProfile, updateProfile, removeAvatar } =
-    useProfile();
-console.log("test",getProfile)
+  const {
+    profile,
+    getProfile,
+    updateProfile,
+    removeAvatar,
+    showBrandName,
+    setShowBrandName,
+  } = useProfile();
+
   const [editMode, setEditMode] = useState(false);
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
   const [avatarFile, setAvatarFile] = useState(null);
@@ -242,7 +251,7 @@ console.log("test",getProfile)
     setForm({
       name: profile.name ?? "",
       email: profile.email ?? "",
-      phone: String(profile.phone ?? ""), // ensure string
+      phone: String(profile.phone ?? ""),
       password: "",
     });
 
@@ -251,8 +260,6 @@ console.log("test",getProfile)
         ? `${AVATAR_BASE_URL}/${profile.avatar}`
         : DEFAULT_AVATAR
     );
-
-    // setAvatar(DEFAULT_AVATAR)
   }, [profile]);
 
   /* ---------------- HANDLERS ---------------- */
@@ -307,7 +314,9 @@ console.log("test",getProfile)
       <div className="bg-white rounded-xl border p-6 space-y-6">
         {/* HEADER */}
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Profile</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-semibold">Profile</h2>
+          </div>
 
           {!editMode ? (
             <button
@@ -333,6 +342,26 @@ console.log("test",getProfile)
             </div>
           )}
         </div>
+
+        {/* BRAND NAME TOGGLE */}
+        <div className="flex items-center justify-between border rounded-lg p-4">
+          <div>
+            <p className="text-sm font-medium">Brand</p>
+          </div>
+
+          <button
+            onClick={() => setShowBrandName((prev) => !prev)}
+            className={`px-4 py-1.5 text-sm rounded-lg border transition ${
+              showBrandName
+                ? "bg-green-600 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            {showBrandName ? "ON" : "OFF"}
+          </button>
+        </div>
+
+        <hr />
 
         {/* PROFILE IMAGE */}
         <div className="flex items-center gap-6">

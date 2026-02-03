@@ -61,12 +61,13 @@ import ResetPassword from "./pages/ResetPassword";
 import { LogoSettingsProvider } from "./context/LogoSettingsContext";
 import { ProfileProvider } from "./context/ProfileContext";
 import LogoSettings from "./pages/settings/components/LogoSettings";
-
+import { useProfile } from "./context/ProfileContext";
 
 
 // import SettingsPage from "./pages/settings/SettingsPage";
 
 export default function App() {
+  // const { showBrandName } = useProfile();
   return (
     <BrowserRouter>
     <LogoSettingsProvider>
@@ -133,6 +134,9 @@ export default function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/categories" element={<Category />} />
           <Route path="/brands" element={<Brands />} />
+           {/* {showBrandName && (
+     <Route path="/brands" element={<Brands />} />
+)} */}
           <Route path="/employees" element={<Employees />} />
           <Route path="/" element={<Navigate to="/settings/social-media" />} />
 
@@ -147,7 +151,7 @@ export default function App() {
             />
             <Route path="variation-settings" element={<VariationSettings />} />
 
-            <Route path="account-settings" element={<AccountSettings />} />
+            {/* <Route path="account-settings" element={<AccountSettings />} /> */}
             <Route
               path="whatsapp-integration"
               element={<WhatsAppIntegrationSettings />}
