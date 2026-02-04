@@ -58,7 +58,7 @@ export default function EditProductDrawer({
         setLoading(true);
 
         const res = await api.get(
-          `/dashboard/product/fetch-products-by-id/${productId}`
+          `/admin-dashboard/product/fetch-products-by-id/${productId}`,
         );
 
         const productData = res.data.data;

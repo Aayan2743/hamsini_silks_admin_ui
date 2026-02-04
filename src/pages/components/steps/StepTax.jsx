@@ -1,130 +1,3 @@
-// import {
-//   forwardRef,
-//   useImperativeHandle,
-//   useState,
-// } from "react";
-// import api from "../../../api/axios";
-
-// const StepTax = forwardRef(({ productId }, ref) => {
-//   const [gstEnabled, setGstEnabled] = useState(false);
-//   const [gstType, setGstType] = useState("exclusive");
-//   const [gstPercent, setGstPercent] = useState("");
-
-//   const [affinityEnabled, setAffinityEnabled] = useState(false);
-//   const [affinityPercent, setAffinityPercent] = useState("");
-
-//   useImperativeHandle(ref, () => ({
-//     async saveStep() {
-//       console.log("🔥 Step 5 saveStep triggered");
-
-//       if (!productId) {
-//         alert("Product ID missing");
-//         return false;
-//       }
-
-//       try {
-//         await api.post(
-//           `/dashboard/product/${productId}/tax-affinity`,
-//           {
-//             gst_enabled: gstEnabled,
-//             gst_type: gstType,
-//             gst_percent: gstEnabled ? gstPercent : 0,
-//             affinity_enabled: affinityEnabled,
-//             affinity_percent: affinityEnabled
-//               ? affinityPercent
-//               : 0,
-//           }
-//         );
-
-//         return true;
-//       } catch (err) {
-//         console.error(err);
-//         alert("Failed to save tax & affinity");
-//         return false;
-//       }
-//     },
-//   }));
-
-//   return (
-//     <div className="bg-white border rounded-xl p-6 space-y-6">
-//       <h3 className="text-lg font-semibold">
-//         Tax & Affinity
-//       </h3>
-
-//       {/* GST */}
-//       <div className="space-y-2">
-//         <label className="flex items-center gap-2">
-//           <input
-//             type="checkbox"
-//             checked={gstEnabled}
-//             onChange={(e) =>
-//               setGstEnabled(e.target.checked)
-//             }
-//           />
-//           Enable GST
-//         </label>
-
-//         {gstEnabled && (
-//           <>
-//             <select
-//               className="input"
-//               value={gstType}
-//               onChange={(e) =>
-//                 setGstType(e.target.value)
-//               }
-//             >
-//               <option value="exclusive">
-//                 Exclusive
-//               </option>
-//               <option value="inclusive">
-//                 Inclusive
-//               </option>
-//             </select>
-
-//             <input
-//               type="number"
-//               className="input"
-//               placeholder="GST %"
-//               value={gstPercent}
-//               onChange={(e) =>
-//                 setGstPercent(e.target.value)
-//               }
-//             />
-//           </>
-//         )}
-//       </div>
-
-//       {/* AFFINITY */}
-//       <div className="space-y-2">
-//         <label className="flex items-center gap-2">
-//           <input
-//             type="checkbox"
-//             checked={affinityEnabled}
-//             onChange={(e) =>
-//               setAffinityEnabled(e.target.checked)
-//             }
-//           />
-//           Enable Affinity
-//         </label>
-
-//         {affinityEnabled && (
-//           <input
-//             type="number"
-//             className="input"
-//             placeholder="Affinity %"
-//             value={affinityPercent}
-//             onChange={(e) =>
-//               setAffinityPercent(e.target.value)
-//             }
-//           />
-//         )}
-//       </div>
-//     </div>
-//   );
-// });
-
-// export default StepTax;
-
 import { forwardRef, useImperativeHandle, useState } from "react";
 import api from "../../../api/axios";
 
@@ -146,7 +19,7 @@ const StepTax = forwardRef(({ productId }, ref) => {
       }
 
       try {
-        await api.post(`/dashboard/product/${productId}/tax-affinity`, {
+        await api.post(`/admin-dashboard/product-tax-affinity/${productId}`, {
           gst_enabled: gstEnabled,
           gst_type: gstType,
           gst_percent: gstEnabled ? gstPercent : 0,
@@ -166,7 +39,9 @@ const StepTax = forwardRef(({ productId }, ref) => {
     <div className="bg-white border rounded-xl shadow-sm p-6 space-y-6">
       {/* HEADER */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-800">Tax & Affinity</h3>
+        <h3 className="text-lg font-semibold text-gray-800">
+          Tax & Affinity dfdfdfddf
+        </h3>
         <p className="text-sm text-gray-500">
           Configure GST and affinity commission settings
         </p>
@@ -176,7 +51,7 @@ const StepTax = forwardRef(({ productId }, ref) => {
       <div className="rounded-lg border p-4 space-y-4">
         <label className="flex items-center justify-between">
           <div>
-            <p className="font-medium text-gray-800">Enable GST</p>
+            <p className="font-medium text-gray-800">Enable GST dfdfdf</p>
             <p className="text-sm text-gray-500">Apply tax on this product</p>
           </div>
 

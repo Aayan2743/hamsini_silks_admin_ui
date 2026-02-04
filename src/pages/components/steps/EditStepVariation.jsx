@@ -1,64 +1,59 @@
-// // src/pages/comp/EditStepVariation.jsx
-
 // import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 // import api from "../../../api/axios";
-
 // import { EditgenerateVariants } from "./EditgenerateVariants";
-// import EditVariantTable from "./EditVariantTable";
 // import EditVariantSelect from "./EditVariantSelect";
+// import EditVariantTable from "./EditVariantTable";
 
 // const EditStepVariation = forwardRef(
 //   ({ productId, existingCombinations = [] }, ref) => {
 //     const [variations, setVariations] = useState([]);
 //     const [selected, setSelected] = useState({});
-//     const [labels, setLabels] = useState([]); // UI only
 //     const [rows, setRows] = useState([]);
-//     const [rowsforEdit, setRowsforEdit] = useState([]);
+//     const [labels, setLabels] = useState([]);
 //     const [loading, setLoading] = useState(false);
-//     const [lastKeys, setLastKeys] = useState([]);
 
-//     /* ================= LOAD ADMIN VARIATIONS ================= */
+//     const [initialized, setInitialized] = useState(false);
+
+//     /* LOAD VARIATIONS */
 //     useEffect(() => {
-//       const loadVariations = async () => {
-//         const res = await api.get("/dashboard/get-variations");
-//         const raw = res.data.data || [];
+//       api.get("/admin-dashboard/get-variations").then((res) => {
+//         const raw = Array.isArray(res.data?.data) ? res.data.data : [];
 
 //         const normalized = raw.map((v) => ({
 //           id: v.id,
 //           name: v.name,
-//           values: (v.variation_values || []).map((val) => ({
+//           type: v.type,
+//           values: (v.values || []).map((val) => ({
 //             id: val.id,
 //             value: val.value,
+//             color_code: val.color_code ?? null,
 //           })),
 //         }));
 
 //         setVariations(normalized);
 
+//         // init selected map
 //         const init = {};
 //         normalized.forEach((v) => (init[v.id] = []));
 //         setSelected(init);
-//       };
-
-//       loadVariations();
+//       });
 //     }, []);
 
-//     /* ================= PREFILL FROM EXISTING COMBINATIONS ================= */
+//     /* PREFILL EXISTING */
 //     useEffect(() => {
 //       if (!existingCombinations.length || !variations.length) return;
 
 //       const sel = {};
 //       const rowMap = {};
 
-//       variations.forEach((v) => {
-//         sel[v.id] = [];
-//       });
+//       variations.forEach((v) => (sel[v.id] = []));
 
-//       // 🔥 build rowMap using VALUE IDS
 //       existingCombinations.forEach((combo) => {
-//         const key = combo.combination_values
-//           .map((cv) => cv.value.id)
-//           .sort()
-//           .join("_");
+//         if (!combo.combination_values) return;
+
+//         const ids = combo.combination_values.map((cv) => cv.value.id).sort();
+
+//         const key = ids.join("_");
 
 //         combo.combination_values.forEach((cv) => {
 //           sel[cv.value.variation_id].push({
@@ -71,10 +66,13 @@
 //           id: combo.id,
 //           sku: combo.sku || "",
 //           price: combo.extra_price || "",
+//           purchase_price: combo.purchase_price || "",
+//           extra_price: combo.extra_price ?? "",
+//           discount: combo.discount || "",
 //           qty: combo.quantity || "",
 //           low_qty: combo.low_quantity || "",
-//           images: combo.images || [], // ✅ KEEP FULL OBJECT
-//           imagesTouched: false, // ✅ IMPORTANT
+//           images: combo.images || [],
+//           imagesTouched: false,
 //         };
 //       });
 
@@ -86,150 +84,60 @@
 
 //       const combos = EditgenerateVariants(sel);
 
-//       const finalRows = combos.map((c) => ({
-//         id: rowMap[c.key]?.id || null,
-//         key: c.key,
-//         label: c.label,
-//         sku: rowMap[c.key]?.sku || "",
-//         price: rowMap[c.key]?.price || "",
-//         qty: rowMap[c.key]?.qty || "",
-//         low_qty: rowMap[c.key]?.low_qty || "",
-//         images: rowMap[c.key]?.images || [],
-//         imagesTouched: false, // ✅ ADD THIS LINE
-//       }));
+//       setRows(
+//         combos.map((c) => ({
+//           key: c.key,
+//           label: c.label,
+//           ...rowMap[c.key],
+//         })),
+//       );
 
-//       console.log("sssssssss", finalRows);
-//       setRowsforEdit(finalRows);
+//       setLabels(combos.map((c) => c.label));
 
-//       setRows(finalRows);
-
-//       setLabels(combos.map((c) => c.label)); // ✅ strings only
+//       // 🔥 MARK PREFILL COMPLETE
+//       setInitialized(true);
 //     }, [existingCombinations, variations]);
 
-//     /* ================= HANDLE SELECT ================= */
+//     useEffect(() => {
+//       // 🚫 DO NOTHING until prefill is done
+//       if (!initialized) return;
 
-//     const handleSelect = (variationId, values) => {
-//       setSelected((prev) => {
-//         const updated = {
-//           ...prev,
-//           [variationId]: values,
-//         };
+//       const active = Object.values(selected).filter(
+//         (vals) => Array.isArray(vals) && vals.length > 0,
+//       );
 
-//         const active = variations.filter(
-//           (v) => updated[v.id] && updated[v.id].length > 0
-//         );
+//       if (!active.length) {
+//         setRows([]);
+//         setLabels([]);
+//         return;
+//       }
 
-//         if (!active.length) {
-//           setRows([]);
-//           setLabels([]);
-//           return updated;
-//         }
+//       const combos = EditgenerateVariants(selected);
 
-//         const combos = EditgenerateVariants(updated);
+//       setRows((prev) =>
+//         combos.map((c) => {
+//           const existing = prev.find((r) => r.key === c.key);
 
-//         setRows((prevRows) =>
-//           combos.map((c) => {
-//             const existing = prevRows.find((r) => r.key === c.key);
-
-//             return (
-//               existing || {
-//                 id: null,
-//                 key: c.key,
-//                 label: c.label,
-//                 sku: "",
-//                 price: "",
-//                 qty: "",
-//                 low_qty: "",
-//                 images: [],
-//               }
-//             );
-//           })
-//         );
-
-//         setLabels(combos.map((c) => c.label));
-
-//         return updated;
-//       });
-//     };
-
-//     /* ================= REGENERATE VARIANTS ================= */
-
-//     useImperativeHandle(ref, () => ({
-//       async saveStep() {
-//         if (!productId) return false;
-
-//         try {
-//           setLoading(true);
-
-//           const formData = new FormData();
-
-//           rows.forEach((row, index) => {
-//             /* ================= BASIC VARIANT DATA ================= */
-
-//             formData.append(`variants[${index}][id]`, row.id || "");
-
-//             formData.append(
-//               `variants[${index}][variation_value_ids]`,
-//               JSON.stringify(row.key.split("_").map(Number))
-//             );
-
-//             formData.append(`variants[${index}][sku]`, row.sku || "");
-//             formData.append(`variants[${index}][extra_price]`, row.price || 0);
-//             formData.append(`variants[${index}][quantity]`, row.qty || 0);
-//             formData.append(
-//               `variants[${index}][low_quantity]`,
-//               row.low_qty || 0
-//             );
-
-//             /* ================= IMAGE DELETE LOGIC ================= */
-//             // 🔴 IMPORTANT: Only run if user touched images
-//             if (row.imagesTouched) {
-//               const keepImageIds = (row.images || [])
-//                 .filter(
-//                   (img) =>
-//                     !(img instanceof File) &&
-//                     img?.id !== undefined &&
-//                     img?.id !== null
-//                 )
-//                 .map((img) => String(img.id));
-
-//               if (keepImageIds.length > 0) {
-//                 // keep selected images
-//                 keepImageIds.forEach((id) => {
-//                   formData.append(`variants[${index}][keep_image_ids][]`, id);
-//                 });
-//               } else {
-//                 // 🔥 user deleted ALL images
-//                 formData.append(`variants[${index}][keep_image_ids]`, "");
-//               }
+//           return (
+//             existing || {
+//               id: null,
+//               key: c.key,
+//               label: c.label,
+//               sku: "",
+//               price: "",
+//               purchase_price: "",
+//               discount: "",
+//               qty: "",
+//               low_qty: "",
+//               images: [],
+//               imagesTouched: false,
 //             }
-
-//             /* ================= NEW IMAGE UPLOAD ================= */
-
-//             (row.images || [])
-//               .filter((img) => img instanceof File)
-//               .forEach((file) => {
-//                 formData.append(`variants[${index}][images][]`, file);
-//               });
-//           });
-
-//           /* ================= API CALL ================= */
-
-//           await api.post(
-//             `/dashboard/product/sync-variations/${productId}`,
-//             formData
 //           );
+//         }),
+//       );
 
-//           return true;
-//         } catch (error) {
-//           console.error("Save variations failed:", error);
-//           alert("Failed to save variations");
-//           return false;
-//         } finally {
-//           setLoading(false);
-//         }
-//       },
-//     }));
+//       setLabels(combos.map((c) => c.label));
+//     }, [selected, initialized]);
 
 //     const addImages = (rowIndex, files) => {
 //       setRows((prev) =>
@@ -237,90 +145,149 @@
 //           i === rowIndex
 //             ? {
 //                 ...row,
-//                 images: [...(row.images || []), ...files], // 🔥 ADD FILES
-//                 imagesTouched: true, // 🔥 MARK AS CHANGED
+//                 images: [...(row.images || []), ...files],
+//                 imagesTouched: true, // ✅ REQUIRED
 //               }
-//             : row
-//         )
+//             : row,
+//         ),
 //       );
 //     };
 
 //     const removeImage = (rowIndex, imgIndex) => {
-//       setRows((prev) =>
-//         prev.map((row, i) =>
-//           i === rowIndex
-//             ? {
-//                 ...row,
-//                 images: row.images.filter((_, j) => j !== imgIndex),
-//                 imagesTouched: true, // 🔴 IMPORTANT
-//               }
-//             : row
-//         )
-//       );
-//     };
+//   setRows((prev) =>
+//     prev.map((row, i) =>
+//       i === rowIndex
+//         ? {
+//             ...row,
+//             images: row.images.filter((_, j) => j !== imgIndex),
+//             imagesTouched: true, // ✅ REQUIRED
+//           }
+//         : row
+//     )
+//   );
 
-//     /* ================= UI ================= */
+//     /* SAVE */
+//     useImperativeHandle(ref, () => ({
+//       async saveStep() {
+//         try {
+//           setLoading(true);
+
+//           const fd = new FormData();
+
+//         rows.forEach((row, index) => {
+//   fd.append(`variants[${index}][id]`, row.id || "");
+//   fd.append(`variants[${index}][sku]`, row.sku || "");
+//   fd.append(`variants[${index}][purchase_price]`, row.purchase_price || 0);
+//   fd.append(`variants[${index}][extra_price]`, row.price || 0);
+//   fd.append(`variants[${index}][discount]`, row.discount || 0);
+//   fd.append(`variants[${index}][quantity]`, row.qty || 0);
+//   fd.append(`variants[${index}][low_quantity]`, row.low_qty || 0);
+
+//   row.key.split("_").forEach((id) => {
+//     fd.append(`variants[${index}][variation_value_ids][]`, id);
+//   });
+
+//   // ✅ IMAGE FIX HERE
+//   if (row.imagesTouched) {
+//     const keepIds = (row.images || [])
+//       .filter((img) => !(img instanceof File) && img?.id)
+//       .map((img) => String(img.id));
+
+//     keepIds.forEach((id) =>
+//       fd.append(`variants[${index}][keep_image_ids][]`, id)
+//     );
+
+//     (row.images || [])
+//       .filter((img) => img instanceof File)
+//       .forEach((file) =>
+//         fd.append(`variants[${index}][images][]`, file)
+//       );
+//   }
+//         });
+
+//           await api.post(
+//             `/admin-dashboard/product/update-variation/${productId}`,
+//             fd,
+//           );
+
+//           return true;
+//         } catch (e) {
+//           alert("Failed to update variations");
+//           return false;
+//         } finally {
+//           setLoading(false);
+//         }
+//       },
+//     }));
+
 //     return (
-//       <div className="space-y-6">
-//         <h3 className="font-semibold">Product Variants</h3>
+//       <div className="bg-white rounded-xl border p-6 space-y-6 overflow-visible">
+//         <h3 className="text-lg font-semibold">Product Variations</h3>
 
 //         {variations.map((v) => (
+//           // <EditVariantSelect
+//           //   key={v.id}
+//           //   label={v.name}
+//           //   options={v.values}
+//           //   selected={selected[v.id] || []}
+//           //   onChange={(vals) => setSelected((p) => ({ ...p, [v.id]: vals }))}
+//           // />
+
 //           <EditVariantSelect
 //             key={v.id}
 //             label={v.name}
 //             options={v.values}
 //             selected={selected[v.id] || []}
-//             onChange={(vals) => handleSelect(v.id, vals)}
+//             onChange={(vals) =>
+//               setSelected((prev) => ({
+//                 ...prev,
+//                 [v.id]: vals,
+//               }))
+//             }
 //           />
 //         ))}
 
 //         {labels.length > 0 && (
-//           <EditVariantTable
-//             variants={labels}
-//             data={rows}
-//             setData={setRows}
-//             removeImage={removeImage}
-//             addImages={addImages}
-//           />
+//           <EditVariantTable variants={labels} data={rows} setData={setRows} />
 //         )}
 
-//         {loading && <p className="text-sm text-blue-600">Saving variants...</p>}
+//         {loading && <p>Saving variations…</p>}
 //       </div>
 //     );
-//   }
+//   },
 // );
 
 // export default EditStepVariation;
-
 import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import api from "../../../api/axios";
-
 import { EditgenerateVariants } from "./EditgenerateVariants";
-import EditVariantTable from "./EditVariantTable";
 import EditVariantSelect from "./EditVariantSelect";
+import EditVariantTable from "./EditVariantTable";
 
 const EditStepVariation = forwardRef(
   ({ productId, existingCombinations = [] }, ref) => {
     const [variations, setVariations] = useState([]);
     const [selected, setSelected] = useState({});
-    const [labels, setLabels] = useState([]);
     const [rows, setRows] = useState([]);
+    const [labels, setLabels] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [initialized, setInitialized] = useState(false);
 
     /* ================= LOAD VARIATIONS ================= */
-
     useEffect(() => {
-      const loadVariations = async () => {
-        const res = await api.get("/dashboard/get-variations");
-        const raw = res.data.data || [];
+      (async () => {
+        const res = await api.get("/admin-dashboard/get-variations");
+        const raw = Array.isArray(res.data?.data) ? res.data.data : [];
 
         const normalized = raw.map((v) => ({
           id: v.id,
           name: v.name,
-          values: (v.variation_values || []).map((val) => ({
-            id: val.id,
-            value: val.value,
-          })),
+          values: Array.isArray(v.values)
+            ? v.values.map((val) => ({
+                id: val.id,
+                value: val.value,
+              }))
+            : [],
         }));
 
         setVariations(normalized);
@@ -328,31 +295,33 @@ const EditStepVariation = forwardRef(
         const init = {};
         normalized.forEach((v) => (init[v.id] = []));
         setSelected(init);
-      };
-
-      loadVariations();
+      })();
     }, []);
 
-    /* ================= PREFILL EXISTING VARIANTS ================= */
-
+    /* ================= PREFILL EXISTING ================= */
     useEffect(() => {
       if (!existingCombinations.length || !variations.length) return;
 
       const sel = {};
       const rowMap = {};
 
-      variations.forEach((v) => {
-        sel[v.id] = [];
-      });
+      variations.forEach((v) => (sel[v.id] = []));
 
       existingCombinations.forEach((combo) => {
-        const key = combo.combination_values
-          .map((cv) => cv.value.id)
-          .sort()
-          .join("_");
+        if (!Array.isArray(combo.combination_values)) return;
+
+        const ids = combo.combination_values
+          .map((cv) => cv?.value?.id)
+          .filter(Boolean)
+          .sort();
+
+        if (!ids.length) return;
+
+        const key = ids.join("_");
 
         combo.combination_values.forEach((cv) => {
-          sel[cv.value.variation_id].push({
+          const variationId = cv.value.variation_id;
+          sel[variationId].push({
             id: cv.value.id,
             value: cv.value.value,
           });
@@ -360,11 +329,14 @@ const EditStepVariation = forwardRef(
 
         rowMap[key] = {
           id: combo.id,
-          sku: combo.sku || "",
-          price: combo.extra_price || "",
-          qty: combo.quantity || "",
-          low_qty: combo.low_quantity || "",
-          images: combo.images || [],
+          label: combo.combination_values.map((v) => v.value.value).join(" / "),
+          sku: combo.sku ?? "",
+          purchase_price: combo.purchase_price ?? "",
+          price: combo.extra_price ?? "",
+          discount: combo.discount ?? "",
+          qty: combo.quantity ?? "",
+          low_qty: combo.low_quantity ?? "",
+          images: combo.images ?? [],
           imagesTouched: false,
         };
       });
@@ -377,64 +349,55 @@ const EditStepVariation = forwardRef(
 
       const combos = EditgenerateVariants(sel);
 
-      const finalRows = combos.map((c) => ({
-        id: rowMap[c.key]?.id || null,
-        key: c.key,
-        label: c.label,
-        sku: rowMap[c.key]?.sku || "",
-        price: rowMap[c.key]?.price || "",
-        qty: rowMap[c.key]?.qty || "",
-        low_qty: rowMap[c.key]?.low_qty || "",
-        images: rowMap[c.key]?.images || [],
-        imagesTouched: false,
-      }));
+      setRows(
+        combos.map((c) => ({
+          key: c.key,
+          label: c.label,
+          ...rowMap[c.key],
+        })),
+      );
 
-      setRows(finalRows);
       setLabels(combos.map((c) => c.label));
+      setInitialized(true);
     }, [existingCombinations, variations]);
 
-    /* ================= HANDLE SELECT ================= */
+    /* ================= REGENERATE ON SELECT ================= */
+    useEffect(() => {
+      if (!initialized) return;
 
-    const handleSelect = (variationId, values) => {
-      setSelected((prev) => {
-        const updated = { ...prev, [variationId]: values };
+      const active = Object.values(selected).some((v) => v.length);
+      if (!active) {
+        setRows([]);
+        setLabels([]);
+        return;
+      }
 
-        const active = variations.filter((v) => updated[v.id]?.length > 0);
+      const combos = EditgenerateVariants(selected);
 
-        if (!active.length) {
-          setRows([]);
-          setLabels([]);
-          return updated;
-        }
+      setRows((prev) =>
+        combos.map((c) => {
+          const existing = prev.find((r) => r.key === c.key);
+          return (
+            existing || {
+              key: c.key,
+              label: c.label,
+              sku: "",
+              purchase_price: "",
+              price: "",
+              discount: "",
+              qty: "",
+              low_qty: "",
+              images: [],
+              imagesTouched: false,
+            }
+          );
+        }),
+      );
 
-        const combos = EditgenerateVariants(updated);
-
-        setRows((prevRows) =>
-          combos.map((c) => {
-            const existing = prevRows.find((r) => r.key === c.key);
-            return (
-              existing || {
-                id: null,
-                key: c.key,
-                label: c.label,
-                sku: "",
-                price: "",
-                qty: "",
-                low_qty: "",
-                images: [],
-                imagesTouched: false,
-              }
-            );
-          })
-        );
-
-        setLabels(combos.map((c) => c.label));
-        return updated;
-      });
-    };
+      setLabels(combos.map((c) => c.label));
+    }, [selected, initialized]);
 
     /* ================= IMAGE HANDLERS ================= */
-
     const addImages = (rowIndex, files) => {
       setRows((prev) =>
         prev.map((row, i) =>
@@ -444,8 +407,8 @@ const EditStepVariation = forwardRef(
                 images: [...(row.images || []), ...files],
                 imagesTouched: true,
               }
-            : row
-        )
+            : row,
+        ),
       );
     };
 
@@ -458,137 +421,92 @@ const EditStepVariation = forwardRef(
                 images: row.images.filter((_, j) => j !== imgIndex),
                 imagesTouched: true,
               }
-            : row
-        )
+            : row,
+        ),
       );
     };
 
-    /* ================= SAVE STEP ================= */
-
+    /* ================= SAVE ================= */
     useImperativeHandle(ref, () => ({
       async saveStep() {
-        if (!productId) return false;
-
         try {
           setLoading(true);
 
-          const formData = new FormData();
+          const fd = new FormData();
 
           rows.forEach((row, index) => {
-            formData.append(`variants[${index}][id]`, row.id || "");
-            formData.append(
-              `variants[${index}][variation_value_ids]`,
-              JSON.stringify(row.key.split("_").map(Number))
+            fd.append(`variants[${index}][id]`, row.id || "");
+            fd.append(`variants[${index}][sku]`, row.sku || "");
+            fd.append(
+              `variants[${index}][purchase_price]`,
+              row.purchase_price || 0,
             );
-            formData.append(`variants[${index}][sku]`, row.sku || "");
-            formData.append(`variants[${index}][extra_price]`, row.price || 0);
-            formData.append(`variants[${index}][quantity]`, row.qty || 0);
-            formData.append(
-              `variants[${index}][low_quantity]`,
-              row.low_qty || 0
-            );
+            fd.append(`variants[${index}][extra_price]`, row.price || 0);
+            fd.append(`variants[${index}][discount]`, row.discount || 0);
+            fd.append(`variants[${index}][quantity]`, row.qty || 0);
+            fd.append(`variants[${index}][low_quantity]`, row.low_qty || 0);
+
+            row.key
+              .split("_")
+              .forEach((id) =>
+                fd.append(`variants[${index}][variation_value_ids][]`, id),
+              );
 
             if (row.imagesTouched) {
-              const keepIds = (row.images || [])
-                .filter((img) => !(img instanceof File) && img?.id)
-                .map((img) => String(img.id));
-
-              if (keepIds.length) {
-                keepIds.forEach((id) =>
-                  formData.append(`variants[${index}][keep_image_ids][]`, id)
+              row.images
+                .filter((img) => !(img instanceof File) && img.id)
+                .forEach((img) =>
+                  fd.append(`variants[${index}][keep_image_ids][]`, img.id),
                 );
-              } else {
-                formData.append(`variants[${index}][keep_image_ids]`, "");
-              }
-            }
 
-            (row.images || [])
-              .filter((img) => img instanceof File)
-              .forEach((file) => {
-                formData.append(`variants[${index}][images][]`, file);
-              });
+              row.images
+                .filter((img) => img instanceof File)
+                .forEach((file) =>
+                  fd.append(`variants[${index}][images][]`, file),
+                );
+            }
           });
 
           await api.post(
-            `/dashboard/product/sync-variations/${productId}`,
-            formData
+            `/admin-dashboard/product/update-variation/${productId}`,
+            fd,
           );
 
           return true;
-        } catch (err) {
-          console.error(err);
-          alert("Failed to save variations");
-          return false;
         } finally {
           setLoading(false);
         }
       },
     }));
 
-    /* ================= UI (MATCHED TO StepVariation) ================= */
-
     return (
-      <div className="bg-white rounded-xl border shadow-sm p-6 space-y-6">
-        {/* HEADER */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800">
-              Product Variations
-            </h3>
-            <p className="text-sm text-gray-500">
-              Select values to generate variants
-            </p>
-          </div>
+      <div className="bg-white rounded-xl border p-6 space-y-6">
+        <h3 className="text-lg font-semibold">Product Variations</h3>
 
-          <a
-            href="/settings/variation-settings"
-            target="_blank"
-            rel="noreferrer"
-            className="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50 transition"
-          >
-            + Add Variation
-          </a>
-        </div>
+        {variations.map((v) => (
+          <EditVariantSelect
+            key={v.id}
+            label={v.name}
+            options={v.values}
+            selected={selected[v.id] || []}
+            onChange={(vals) => setSelected((p) => ({ ...p, [v.id]: vals }))}
+          />
+        ))}
 
-        {/* SELECTS */}
-        <div className="space-y-4">
-          {variations.map((v) => (
-            <EditVariantSelect
-              key={v.id}
-              label={v.name}
-              options={v.values}
-              selected={selected[v.id] || []}
-              onChange={(vals) => handleSelect(v.id, vals)}
-            />
-          ))}
-        </div>
-
-        {/* TABLE */}
         {labels.length > 0 && (
-          <div className="border rounded-xl p-4">
-            <EditVariantTable
-              variants={labels}
-              data={rows}
-              setData={setRows}
-              addImages={addImages}
-              removeImage={removeImage}
-            />
-          </div>
+          <EditVariantTable
+            variants={labels}
+            data={rows}
+            setData={setRows}
+            addImages={addImages}
+            removeImage={removeImage}
+          />
         )}
 
-        {/* EMPTY */}
-        {variations.length > 0 &&
-          variations.every((v) => !v.values?.length) && (
-            <div className="rounded-lg border border-dashed p-4 text-center text-sm text-gray-500">
-              No variation values found. Add values from{" "}
-              <strong>Variation Settings</strong>.
-            </div>
-          )}
-
-        {loading && <p className="text-sm text-indigo-600">Saving variants…</p>}
+        {loading && <p>Saving variations…</p>}
       </div>
     );
-  }
+  },
 );
 
 export default EditStepVariation;

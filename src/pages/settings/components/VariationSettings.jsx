@@ -7,6 +7,8 @@ export default function VariationSettings() {
   const [loading, setLoading] = useState(false);
 
   /* ================= LOAD VARIATIONS ================= */
+  // const loadVariations = async () => {
+
   const loadVariations = async () => {
     try {
       const res = await api.get("/admin-dashboard/get-variations");
@@ -15,7 +17,7 @@ export default function VariationSettings() {
         id: v.id,
         name: v.name,
         type: v.type,
-        values: (v.variation_values || []).map((val) =>
+        values: (v.values || []).map((val) =>
           v.type === "color"
             ? {
                 id: val.id,
