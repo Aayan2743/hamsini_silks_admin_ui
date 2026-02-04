@@ -13,37 +13,9 @@ const EditStepVariation = forwardRef(
     const [rows, setRows] = useState([]);
     const [labels, setLabels] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [initialized, setInitialized] = useState(false);
+    // const [initialized, setInitialized] = useState(false);
 
     const [skipNextRegen, setSkipNextRegen] = useState(false);
-
-    /* ================= LOAD VARIATIONS ================= */
-    useEffect(() => {
-      (async () => {
-        const res = await api.get("/admin-dashboard/get-variations");
-        const raw = Array.isArray(res.data?.data) ? res.data.data : [];
-
-        const normalized = raw.map((v) => ({
-          id: v.id,
-          name: v.name,
-          values: Array.isArray(v.values)
-            ? v.values.map((val) => ({
-                id: val.id,
-                value: val.value,
-              }))
-            : [],
-        }));
-
-        setVariations(normalized);
-
-        const init = {};
-        normalized.forEach((v) => (init[v.id] = []));
-        setSelected(init);
-
-        // 🔥 ADD THIS LINE
-        // setInitialized(true);
-      })();
-    }, []);
 
     /* ================= PREFILL EXISTING ================= */
 
@@ -85,6 +57,7 @@ const EditStepVariation = forwardRef(
 
         // Map existing row data by key
         rowMap[key] = {
+          key,
           id: combo.id,
           label: combo.combination_values.map((v) => v.value.value).join(" / "),
           sku: combo.sku ?? "",
@@ -110,11 +83,19 @@ const EditStepVariation = forwardRef(
       const combos = EditgenerateVariants(sel);
 
       // Prefill rows using rowMap
+      // setRows(
+      //   combos.map((c) => ({
+      //     key: c.key,
+      //     label: c.label,
+      //     ...(rowMap[c.key] || {}), // 🔥 safe spread
+      //   })),
+      // );
+
       setRows(
         combos.map((c) => ({
           key: c.key,
           label: c.label,
-          ...(rowMap[c.key] || {}), // 🔥 safe spread
+          ...(rowMap[c.key] || {}),
         })),
       );
 
@@ -122,97 +103,80 @@ const EditStepVariation = forwardRef(
 
       // 🔥 Prevent overwrite by regenerate effect
       setSkipNextRegen(true);
-      setInitialized(true);
+      // setInitialized(true);
     }, [existingCombinations, variations]);
 
     /* ================= REGENERATE ON SELECT ================= */
 
-    // useEffect(() => {
-    //   if (!initialized) return;
-
-    //   const active = Object.values(selected).some((v) => v.length);
-    //   if (!active) return;
-
-    //   const combos = EditgenerateVariants(selected);
-
-    //   setRows((prev) => {
-    //     const map = new Map(prev.map((r) => [r.key, r]));
-
-    //     combos.forEach((c) => {
-    //       if (!map.has(c.key)) {
-    //         map.set(c.key, {
-    //           key: c.key,
-    //           label: c.label,
-    //           sku: "",
-    //           purchase_price: "",
-    //           price: "",
-    //           discount: "",
-    //           qty: "",
-    //           low_qty: "",
-    //           images: [],
-    //           imagesTouched: false,
-    //         });
-    //       }
-    //     });
-
-    //     return Array.from(map.values());
-    //   });
-
-    //   setLabels(combos.map((c) => c.label));
-    // }, [selected, initialized]);
-
     useEffect(() => {
-      if (!initialized) return;
+      if (!variations.length) return;
 
       const groups = Object.values(selected).filter(
-        (vals) => Array.isArray(vals) && vals.length > 0,
+        (vals) => Array.isArray(vals) && vals.length,
       );
 
-      // No selections → clear all
+      // 🔥 DO NOT CLEAR ROWS ON EDIT LOAD
       if (!groups.length) {
-        setRows([]);
-        setLabels([]);
+        if (existingCombinations.length === 0) {
+          setRows([]);
+          setLabels([]);
+        }
         return;
       }
 
-      // All currently valid combinations
       const combos = EditgenerateVariants(selected);
-      const validKeys = new Set(combos.map((c) => c.key));
 
-      setRows((prev) => {
-        const map = new Map();
+      setRows((prev) =>
+        combos.map((c) => {
+          const existing = prev.find((r) => r.key === c.key);
 
-        // 1️⃣ KEEP rows that are still valid
-        prev.forEach((row) => {
-          if (validKeys.has(row.key)) {
-            map.set(row.key, row);
-          }
-        });
-
-        // 2️⃣ ADD new rows if missing
-        combos.forEach((c) => {
-          if (!map.has(c.key)) {
-            map.set(c.key, {
-              key: c.key,
-              label: c.label,
-              sku: "",
-              purchase_price: "",
-              price: "",
-              discount: "",
-              qty: "",
-              low_qty: "",
-              images: [],
-              imagesTouched: false,
-            });
-          }
-        });
-
-        return Array.from(map.values());
-      });
+          return existing
+            ? { ...existing, label: c.label }
+            : {
+                key: c.key,
+                label: c.label,
+                sku: "",
+                purchase_price: "",
+                price: "",
+                discount: "",
+                qty: "",
+                low_qty: "",
+                images: [],
+                imagesTouched: false,
+              };
+        }),
+      );
 
       setLabels(combos.map((c) => c.label));
-    }, [selected, initialized]);
+    }, [selected, variations, existingCombinations]);
 
+    /* ================= LOAD VARIATIONS ================= */
+    useEffect(() => {
+      (async () => {
+        const res = await api.get("/admin-dashboard/get-variations");
+        const raw = Array.isArray(res.data?.data) ? res.data.data : [];
+
+        const normalized = raw.map((v) => ({
+          id: v.id,
+          name: v.name,
+          values: Array.isArray(v.values)
+            ? v.values.map((val) => ({
+                id: val.id,
+                value: val.value,
+              }))
+            : [],
+        }));
+
+        setVariations(normalized);
+
+        const init = {};
+        normalized.forEach((v) => (init[v.id] = []));
+        setSelected(init);
+
+        // 🔥 ADD THIS LINE
+        // setInitialized(true);
+      })();
+    }, []);
     /* ================= IMAGE HANDLERS ================= */
     const addImages = (rowIndex, files) => {
       setRows((prev) =>
@@ -305,7 +269,14 @@ const EditStepVariation = forwardRef(
             label={v.name}
             options={v.values}
             selected={selected[v.id] || []}
-            onChange={(vals) => setSelected((p) => ({ ...p, [v.id]: vals }))}
+            // onChange={(vals) => setSelected((p) => ({ ...p, [v.id]: vals }))}
+
+            onChange={(vals) =>
+              setSelected((p) => ({
+                ...p,
+                [v.id]: [...vals],
+              }))
+            }
           />
         ))}
 
