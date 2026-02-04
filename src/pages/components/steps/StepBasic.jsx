@@ -10,6 +10,10 @@ export default function StepBasic({ setStep, setProductId }) {
 
   const [priceError, setPriceError] = useState("");
 
+  const [bulkFile, setBulkFile] = useState(null);
+  const [bulkErrors, setBulkErrors] = useState([]);
+  const [bulkSuccess, setBulkSuccess] = useState("");
+
   const [form, setForm] = useState({
     name: "",
     category_id: "",
@@ -133,16 +137,103 @@ export default function StepBasic({ setStep, setProductId }) {
     }
   };
 
+  const handleBulkUpload = async () => {
+    if (!bulkFile) return;
+
+    const formData = new FormData();
+    formData.append("file", bulkFile);
+
+    try {
+      setLoading(true);
+      setBulkErrors([]);
+      setBulkSuccess("");
+
+      const res = await api.post(
+        "/admin-dashboard/product/bulk-upload",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } },
+      );
+
+      setBulkSuccess(`✅ ${res.data.inserted} products uploaded`);
+
+      if (res.data.errors?.length) {
+        setBulkErrors(res.data.errors);
+      }
+
+      setBulkFile(null);
+    } catch (err) {
+      console.error(err);
+
+      if (err.response?.data?.errors) {
+        // Laravel validation errors
+        setBulkErrors(err.response.data.errors);
+      } else {
+        setBulkErrors([
+          { row: "-", errors: { general: [err.message || "Upload failed"] } },
+        ]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (pageLoading) {
     return <div className="py-12 text-center">Loading...</div>;
   }
 
   return (
     <div className="bg-white rounded-xl border shadow-sm p-6 space-y-6">
+      {bulkSuccess && (
+        <div className="p-3 rounded-lg bg-green-100 text-green-800 text-sm">
+          {bulkSuccess}
+        </div>
+      )}
+
+      {/* BULK UPLOAD ERRORS */}
+      {bulkErrors.length > 0 && (
+        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3">
+          <h4 className="text-sm font-semibold text-red-700 mb-2">
+            Upload Errors
+          </h4>
+
+          <ul className="text-sm text-red-700 space-y-1 max-h-40 overflow-y-auto">
+            {bulkErrors.map((item, i) => (
+              <li key={i}>
+                <strong>Row {item.row}:</strong>{" "}
+                {Object.values(item.errors).flat().join(", ")}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {/* HEADER */}
       <div>
         <h3 className="text-lg font-semibold">Basic Information</h3>
         <p className="text-sm text-gray-500">Enter product details</p>
+      </div>
+      {/* ================= BULK UPLOAD ================= */}
+      <div className="border rounded-xl p-4 bg-gray-50 space-y-3">
+        <h4 className="font-medium text-gray-800">Bulk Upload Products</h4>
+
+        <input
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          onChange={(e) => setBulkFile(e.target.files[0])}
+          className="block w-full text-sm"
+        />
+
+        <button
+          onClick={handleBulkUpload}
+          disabled={!bulkFile || loading}
+          className="px-4 py-2 rounded-lg bg-green-600 text-white text-sm
+               hover:bg-green-700 disabled:opacity-50"
+        >
+          {loading ? "Uploading..." : "Upload Excel"}
+        </button>
+
+        <p className="text-xs text-gray-500">
+          Upload Excel file to create multiple products at once
+        </p>
       </div>
 
       {/* PRODUCT NAME */}
@@ -196,37 +287,6 @@ export default function StepBasic({ setStep, setProductId }) {
       </FormGroup>
 
       {/* PRICES */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* <FormGroup label="Price (₹)">
-          <input
-            type="number"
-            className="input"
-            value={form.base_price}
-            onChange={(e) => handleChange("base_price", e.target.value)}
-          />
-        </FormGroup>
-
-        <FormGroup label="Purchase Price (₹)">
-          <input
-            type="number"
-            className={`input ${priceError ? "border-red-500" : ""}`}
-            value={form.purchase_price}
-            onChange={(e) => handleChange("purchase_price", e.target.value)}
-          />
-          {priceError && (
-            <p className="text-xs text-red-600 mt-1">{priceError}</p>
-          )}
-        </FormGroup> */}
-      </div>
-
-      {/* <FormGroup label="Discount (₹)">
-        <input
-          type="number"
-          className="input"
-          value={form.discount}
-          onChange={(e) => handleChange("discount", e.target.value)}
-        />
-      </FormGroup> */}
 
       {/* ACTION */}
       <button

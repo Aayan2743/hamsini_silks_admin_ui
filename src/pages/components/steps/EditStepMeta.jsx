@@ -18,7 +18,7 @@ const EditStepMeta = forwardRef(({ productId, meta }, ref) => {
       setTags(
         Array.isArray(meta.meta_tags)
           ? meta.meta_tags
-          : meta.meta_tags.split(",")
+          : meta.meta_tags.split(","),
       );
     }
   }, [meta]);
@@ -44,11 +44,14 @@ const EditStepMeta = forwardRef(({ productId, meta }, ref) => {
       if (!productId) return false;
 
       try {
-        await api.post(`/dashboard/product/update-meta/${productId}`, {
-          meta_title: title,
-          meta_description: description,
-          meta_tags: tags.join(","), // 🔥 store as string
-        });
+        await api.post(
+          `/admin-dashboard/product-seo-meta/update-meta/${productId}`,
+          {
+            meta_title: title,
+            meta_description: description,
+            meta_tags: tags.join(","), // 🔥 store as string
+          },
+        );
 
         return true;
       } catch (err) {

@@ -13,21 +13,19 @@ const EditStepTax = forwardRef(({ productId, data, productStatus }, ref) => {
 
   /* ================= PREFILL ================= */
   useEffect(() => {
-    if (data) {
-      const gstPct = Number(data.gst_percent || 0);
-      const affinityPct = Number(data.affinity_percent || 0);
+    if (!data) return;
 
-      setGstEnabled(data.gst_enabled === true || gstPct > 0);
-      setGstType(data.gst_type || "inclusive");
-      setGstPercent(gstPct.toFixed(2));
+    console.log("RUNNING PREFILL", data);
 
-      setAffinityEnabled(data.affinity_enabled === true || affinityPct > 0);
-      setAffinityPercent(affinityPct.toFixed(2));
-    }
+    setGstEnabled(Boolean(data.gst_enabled));
+    setGstType(data.gst_type || "inclusive");
+    setGstPercent(Number(data.gst_percent ?? 0).toFixed(2));
 
-    // 🔥 READ STATUS FROM PRODUCTS TABLE
-    setIsPublished(productStatus === "published");
-  }, [data?.id, productStatus]);
+    setAffinityEnabled(Boolean(data.affinity_enabled));
+    setAffinityPercent(Number(data.affinity_percent ?? 0).toFixed(2));
+
+    setIsPublished(productStatus === "published" || productStatus === "active");
+  }, [data, productStatus]);
 
   /* ================= SAVE STEP ================= */
   useImperativeHandle(ref, () => ({
@@ -35,16 +33,19 @@ const EditStepTax = forwardRef(({ productId, data, productStatus }, ref) => {
       if (!productId) return false;
 
       try {
-        await api.post(`/dashboard/product/update-tax/${productId}`, {
-          gst_enabled: gstEnabled,
-          gst_type: gstType,
-          gst_percent: gstEnabled ? Number(gstPercent) : 0,
+        await api.post(
+          `/admin-dashboard/product-tax-affinity/update-tax/${productId}`,
+          {
+            gst_enabled: gstEnabled,
+            gst_type: gstType,
+            gst_percent: gstEnabled ? Number(gstPercent) : 0,
 
-          affinity_enabled: affinityEnabled,
-          affinity_percent: affinityEnabled ? Number(affinityPercent) : 0,
+            affinity_enabled: affinityEnabled,
+            affinity_percent: affinityEnabled ? Number(affinityPercent) : 0,
 
-          status: isPublished ? "published" : "draft", // 👈 IMPORTANT
-        });
+            status: isPublished ? "published" : "draft", // 👈 IMPORTANT
+          },
+        );
 
         return true;
       } catch (err) {

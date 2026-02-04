@@ -76,10 +76,8 @@ export default function EditVariantTable({
                   <input
                     type="number"
                     className="w-24 border rounded px-2 py-1"
-                    value={row.extra_price ?? ""}
-                    onChange={(e) =>
-                      update(rowIndex, "selling_price", e.target.value)
-                    }
+                    value={row.price ?? ""}
+                    onChange={(e) => update(rowIndex, "price", e.target.value)}
                   />
                 </td>
 

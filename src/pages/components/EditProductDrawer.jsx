@@ -162,12 +162,7 @@ export default function EditProductDrawer({
                   ref={taxRef}
                   productId={product?.id}
                   productStatus={product?.status}
-                  data={
-                    Array.isArray(product?.product_tax) &&
-                    product.product_tax.length > 0
-                      ? product.product_tax[0]
-                      : null
-                  }
+                  data={product?.product_tax} // ✅ FIXED
                 />
               )}
             </>
