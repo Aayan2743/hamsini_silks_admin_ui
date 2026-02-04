@@ -7,11 +7,11 @@ const menu = [
   { label: "Payment gateway", path: "/settings/payment-gateway" },
   { label: "Variation Settings", path: "/settings/variation-settings" },
   { label: "Whats App Integration", path: "/settings/whatsapp-integration" },
-
-  { label: "account-settings", path: "/settings/account-settings" },
+  // { label: "account-settings", path: "/settings/account-settings" },
   { label: "coupons-settings", path: "/settings/coupons-settings" },
-];
+  // { label: "Settings", path: "" },
 
+];
 export default function SettingsSidebar() {
   return (
     <div className="w-60">
