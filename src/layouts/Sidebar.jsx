@@ -138,15 +138,15 @@ import { useLogoSettings } from "../context/LogoSettingsContext";
 import defaultimage from "../assets/profile.jpg";
 
 const SIDEBAR_WIDTH = "88px";
-const FALLBACK_LOGO = defaultimage
+const FALLBACK_LOGO = defaultimage;
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_Image_URl;
 
 export default function Sidebar({ open, setOpen, logout }) {
   const { settings } = useAppSettings();
-   const { showBrandName } = useProfile();
+  const { showBrandName } = useProfile();
   const {
     settings: logoSettings,
-    getLogoSettings,          // ✅ IMPORTANT
+    getLogoSettings, // ✅ IMPORTANT
   } = useLogoSettings();
 
   const location = useLocation();
@@ -170,7 +170,7 @@ export default function Sidebar({ open, setOpen, logout }) {
         ? `${BASE_URL}${logoSettings.app_logo}?t=${
             logoSettings.updated_at || Date.now()
           }`
-        : FALLBACK_LOGO
+        : FALLBACK_LOGO,
     );
   }, [logoSettings]);
 
@@ -184,13 +184,11 @@ export default function Sidebar({ open, setOpen, logout }) {
       to={to}
       onClick={() => setOpen(false)}
       className={`flex flex-col items-center justify-center gap-1 py-3 rounded-lg text-center ${isActive(
-        to
+        to,
       )}`}
     >
       <Icon size={20} />
-      <span className="text-[10px] leading-tight max-w-[64px]">
-        {label}
-      </span>
+      <span className="text-[10px] leading-tight max-w-[64px]">{label}</span>
     </Link>
   );
 
@@ -208,11 +206,7 @@ export default function Sidebar({ open, setOpen, logout }) {
       <div className="h-full flex flex-col">
         {/* LOGO */}
         <div className="h-16 flex items-center justify-center border-b">
-          <img
-            src={logo}
-            alt="App Logo"
-            className="h-8"
-          />
+          <img src={logo} alt="App Logo" className="h-8" />
         </div>
 
         {/* MENU */}
@@ -221,15 +215,16 @@ export default function Sidebar({ open, setOpen, logout }) {
           <Item to="/products" icon={Box} label="Products" />
           <Item to="/categories" icon={Tag} label="Category" />
           {/* <Item to="/brands" icon={Store} label="Brand" /> */}
-          {showBrandName && (
-  <Item to="/brands" icon={Store} label="Brand" />
-)}
-          {showBrandName&&<Item to="/pos" icon={ShoppingCart} label="POS" />}
+          {showBrandName && <Item to="/brands" icon={Store} label="Brand" />}
+          {showBrandName && <Item to="/pos" icon={ShoppingCart} label="POS" />}
           <Item to="/expenses" icon={DollarSign} label="Expenses" />
           <Item to="/orders" icon={Package} label="Orders" />
           <Item to="/online-orders" icon={Package} label="Online Orders" />
           <Item to="/reports" icon={BarChart} label="Reports" />
           <Item to="/users" icon={Users} label="Users" />
+          <Item to="/my-staff" icon={Users} label="My Staff" />
+          <Item to="/add-staff" icon={Users} label="Add Staff" />
+          <Item to="/staff-attendance" icon={Users} label="Staff Attendance" />
           <Item to="/settings/profile" icon={Settings} label="Settings" />
         </nav>
 
@@ -246,4 +241,3 @@ export default function Sidebar({ open, setOpen, logout }) {
     </aside>
   );
 }
-

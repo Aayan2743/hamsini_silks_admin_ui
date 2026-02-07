@@ -64,7 +64,6 @@
 // import { useProfile } from "./context/ProfileContext";
 // import BrandProtectedRoute from "./auth/BrandProtectedRoute";
 
-
 // // import SettingsPage from "./pages/settings/SettingsPage";
 
 // export default function App() {
@@ -135,7 +134,7 @@
 //           <Route path="/products" element={<Products />} />
 //           <Route path="/categories" element={<Category />} />
 //           {/* <Route path="/brands" element={<Brands />} /> */}
-         
+
 //            {showBrandName && (
 //             <Route
 //             path="/brands"
@@ -145,7 +144,7 @@
 //               </BrandProtectedRoute>
 //             }
 //           />
-     
+
 // )}
 //           <Route path="/employees" element={<Employees />} />
 //           <Route path="/" element={<Navigate to="/settings/social-media" />} />
@@ -292,6 +291,10 @@ import { ProfileProvider, useProfile } from "./context/ProfileContext";
 
 /* BRAND PROTECTED ROUTE */
 import BrandProtectedRoute from "./auth/BrandProtectedRoute";
+import CustomerCombinedReport from "./pages/CustomerCombinedReport";
+import StaffComponent from "./pages/StaffComponent";
+import StaffAddComponent from "./pages/StaffAddComponent";
+import StaffAttendanceCalendar from "./pages/StaffAttendanceCalendar";
 
 export default function App() {
   return (
@@ -376,7 +379,10 @@ export default function App() {
                   path="payment-gateway"
                   element={<PaymentGatewaySettings />}
                 />
-                <Route path="variation-settings" element={<VariationSettings />} />
+                <Route
+                  path="variation-settings"
+                  element={<VariationSettings />}
+                />
                 <Route
                   path="whatsapp-integration"
                   element={<WhatsAppIntegrationSettings />}
@@ -385,15 +391,19 @@ export default function App() {
               </Route>
 
               {/* JOB CARDS */}
-              <Route path="/jewellery-job-card" element={<JewelleryJobCard />} />
-              <Route path="/gem-stone-job-card" element={<GemStoneJobCard />} />
-              <Route path="/diamond-job-card" element={<DimondJobCard />} />
 
               {/* ORDERS */}
               <Route path="/orders" element={<POSOrders />} />
               <Route path="/pos/orders/:id" element={<POSOrderView />} />
               <Route path="/online-orders" element={<OrdersPage />} />
               <Route path="/orders/:id" element={<OrderDetail />} />
+              <Route path="/users" element={<CustomerCombinedReport />} />
+              <Route path="/my-staff" element={<StaffComponent />} />
+              <Route path="/add-staff" element={<StaffAddComponent />} />
+              <Route
+                path="/staff-attendance"
+                element={<StaffAttendanceCalendar />}
+              />
 
               {/* POS */}
               <Route
@@ -414,4 +424,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-
