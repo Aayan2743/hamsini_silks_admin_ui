@@ -165,13 +165,7 @@ export default function Sidebar({ open, setOpen, logout }) {
   useEffect(() => {
     if (!logoSettings) return;
 
-    setLogo(
-      logoSettings.app_logo
-        ? `${BASE_URL}${logoSettings.app_logo}?t=${
-            logoSettings.updated_at || Date.now()
-          }`
-        : FALLBACK_LOGO,
-    );
+    setLogo(logoSettings.app_logo_url || FALLBACK_LOGO);
   }, [logoSettings]);
 
   const isActive = (path) =>
@@ -215,14 +209,14 @@ export default function Sidebar({ open, setOpen, logout }) {
           <Item to="/products" icon={Box} label="Products" />
           <Item to="/categories" icon={Tag} label="Category" />
           {/* <Item to="/brands" icon={Store} label="Brand" /> */}
-          {showBrandName && (
+          {/* {showBrandName && (
   <Item to="/brands" icon={Store} label="Brand" />
-)}
-          {showBrandName&&<Item to="/pos" icon={ShoppingCart} label="POS" />}
-          <Item to="/expenses" icon={DollarSign} label="Expenses" />
+)} */}
+          {/* {showBrandName && <Item to="/pos" icon={ShoppingCart} label="POS" />}
+          <Item to="/expenses" icon={DollarSign} label="Expenses" /> */}
           <Item to="/orders" icon={Package} label="Orders" />
-          <Item to="/online-orders" icon={Package} label="Online Orders" />
-          <Item to="/reports" icon={BarChart} label="Reports" />
+          {/* <Item to="/online-orders" icon={Package} label="Online Orders" /> */}
+          {/* <Item to="/reports" icon={BarChart} label="Reports" /> */}
           <Item to="/users" icon={Users} label="Users" />
           <Item to="/my-staff" icon={Users} label="My Staff" />
           <Item to="/add-staff" icon={Users} label="Add Staff" />

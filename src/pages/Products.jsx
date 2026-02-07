@@ -167,7 +167,7 @@ export default function Products() {
                       }}
                       className="text-indigo-600 hover:underline"
                     >
-                      Edit {p.id}
+                      Edit
                     </button>
                   </td>
                 </tr>
