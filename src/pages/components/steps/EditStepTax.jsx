@@ -24,7 +24,9 @@ const EditStepTax = forwardRef(({ productId, data, productStatus }, ref) => {
     setAffinityEnabled(Boolean(data.affinity_enabled));
     setAffinityPercent(Number(data.affinity_percent ?? 0).toFixed(2));
 
-    setIsPublished(productStatus === "published" || productStatus === "active");
+    setIsPublished(
+      productStatus === "Published" || productStatus === "Published",
+    );
   }, [data, productStatus]);
 
   /* ================= SAVE STEP ================= */
@@ -43,7 +45,7 @@ const EditStepTax = forwardRef(({ productId, data, productStatus }, ref) => {
             affinity_enabled: affinityEnabled,
             affinity_percent: affinityEnabled ? Number(affinityPercent) : 0,
 
-            status: isPublished ? "published" : "draft", // 👈 IMPORTANT
+            status: isPublished ? "Published" : "draft", // 👈 IMPORTANT
           },
         );
 

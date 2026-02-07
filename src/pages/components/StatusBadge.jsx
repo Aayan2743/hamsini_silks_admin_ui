@@ -1,6 +1,7 @@
 export default function StatusBadge({ status }) {
+  console.log("satys", status);
   const map = {
-    published: {
+    Published: {
       text: "Published",
       className: "bg-green-100 text-green-700",
     },

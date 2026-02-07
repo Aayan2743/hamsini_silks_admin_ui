@@ -93,7 +93,9 @@ export default function Products() {
               <th className="px-4 py-3 text-left">Image</th>
               <th className="px-4 py-3 text-left">Product Name</th>
               <th className="px-4 py-3 text-left">Category</th>
-              <th className="px-4 py-3 text-left">Brand</th>
+
+              {/*<th className="px-4 py-3 text-left">Brand</th> */}
+
               <th className="px-4 py-3 text-left">Price</th>
               <th className="px-4 py-3 text-left">Status</th>
               <th className="px-4 py-3 text-left">Action</th>
@@ -130,8 +132,27 @@ export default function Products() {
                     )}
                   </td>
                   <td className="px-4 py-3 font-medium">{p.name}</td>
-                  <td className="px-4 py-3">{p.category_name || "-"}</td>
-                  <td className="px-4 py-3">{p.brand_name || "-"}</td>
+                  {/* <td className="px-4 py-3">
+                    {p.category_name || "-"} - {p.category_main}
+                  </td> */}
+
+                  <td className="px-4 py-3 text-sm">
+                    {p.category_main ? (
+                      <>
+                        <span className="text-gray-500">{p.category_main}</span>
+                        <span className="mx-1">/</span>
+                        <span className="font-medium text-gray-800">
+                          {p.category_name}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="font-medium">
+                        {p.category_name || "-"}
+                      </span>
+                    )}
+                  </td>
+
+                  {/* <td className="px-4 py-3">{p.brand_name || "-"}</td> */}
                   <td className="px-4 py-3">₹{p.final_price}</td>
                   <td className="px-4 py-3">
                     <StatusBadge status={p.status} />

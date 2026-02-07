@@ -183,13 +183,14 @@ export default function StepBasic({ setStep, setProductId }) {
 
   return (
     <div className="bg-white rounded-xl border shadow-sm p-6 space-y-6">
+      {/*
       {bulkSuccess && (
         <div className="p-3 rounded-lg bg-green-100 text-green-800 text-sm">
           {bulkSuccess}
         </div>
       )}
 
-      {/* BULK UPLOAD ERRORS */}
+      BULK UPLOAD ERRORS 
       {bulkErrors.length > 0 && (
         <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3">
           <h4 className="text-sm font-semibold text-red-700 mb-2">
@@ -205,13 +206,13 @@ export default function StepBasic({ setStep, setProductId }) {
             ))}
           </ul>
         </div>
-      )}
+      )} */}
       {/* HEADER */}
       <div>
         <h3 className="text-lg font-semibold">Basic Information</h3>
         <p className="text-sm text-gray-500">Enter product details</p>
       </div>
-      {/* ================= BULK UPLOAD ================= */}
+      {/* ================= BULK UPLOAD ================= 
       <div className="border rounded-xl p-4 bg-gray-50 space-y-3">
         <h4 className="font-medium text-gray-800">Bulk Upload Products</h4>
 
@@ -235,6 +236,7 @@ export default function StepBasic({ setStep, setProductId }) {
           Upload Excel file to create multiple products at once
         </p>
       </div>
+      */}
 
       {/* PRODUCT NAME */}
       <FormGroup label="Product Name">
@@ -267,14 +269,14 @@ export default function StepBasic({ setStep, setProductId }) {
       )}
 
       {/* BRAND */}
-      <SearchableSelect
+      {/* <SearchableSelect
         label="Brand"
         options={brands}
         value={form.brand_id}
         onChange={(id) => handleChange("brand_id", id)}
         placeholder="Select brand"
         showStatus
-      />
+      /> */}
 
       {/* DESCRIPTION */}
       <FormGroup label="Description">

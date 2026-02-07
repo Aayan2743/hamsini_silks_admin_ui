@@ -1,6 +1,3 @@
-
-
-
 import { useEffect, useState } from "react";
 import SettingsLayout from "../SettingsLayout";
 import useDynamicTitle from "../../../hooks/useDynamicTitle";
@@ -15,8 +12,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL_Image_URl;
 export default function LogoSettings() {
   useDynamicTitle("Logo Settings");
 
-  const { settings, getLogoSettings, updateLogoSettings } =
-    useLogoSettings();
+  const { settings, getLogoSettings, updateLogoSettings } = useLogoSettings();
 
   const [editMode, setEditMode] = useState(false);
 
@@ -38,17 +34,9 @@ export default function LogoSettings() {
 
     setAppName(settings.app_name ?? "");
 
-    setLogo(
-      settings.app_logo
-        ? `${BASE_URL}${settings.app_logo}?t=${settings.updated_at || Date.now()}`
-        : DEFAULT_LOGO
-    );
+    setLogo(settings.app_logo_url || DEFAULT_LOGO);
 
-    setFavicon(
-      settings.app_favicon
-        ? `${BASE_URL}${settings.app_favicon}?t=${settings.updated_at || Date.now()}`
-        : DEFAULT_FAVICON
-    );
+    setFavicon(settings.app_favicon_url || DEFAULT_FAVICON);
   }, [settings]);
 
   /* ---------------- IMAGE HANDLER ---------------- */
