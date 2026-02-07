@@ -122,7 +122,7 @@ export default function Products() {
                         alt={p.name}
                         className="w-12 h-12 rounded-lg object-cover border"
                         onError={(e) => {
-                          e.target.src = "/no-image.png"; // optional fallback
+                          e.target.src = "/logo/noimage.jfif"; // optional fallback
                         }}
                       />
                     ) : (

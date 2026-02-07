@@ -215,8 +215,10 @@ export default function Sidebar({ open, setOpen, logout }) {
           <Item to="/products" icon={Box} label="Products" />
           <Item to="/categories" icon={Tag} label="Category" />
           {/* <Item to="/brands" icon={Store} label="Brand" /> */}
-          {showBrandName && <Item to="/brands" icon={Store} label="Brand" />}
-          {showBrandName && <Item to="/pos" icon={ShoppingCart} label="POS" />}
+          {showBrandName && (
+  <Item to="/brands" icon={Store} label="Brand" />
+)}
+          {showBrandName&&<Item to="/pos" icon={ShoppingCart} label="POS" />}
           <Item to="/expenses" icon={DollarSign} label="Expenses" />
           <Item to="/orders" icon={Package} label="Orders" />
           <Item to="/online-orders" icon={Package} label="Online Orders" />
