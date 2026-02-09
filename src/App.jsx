@@ -224,6 +224,212 @@
 //   );
 // }
 
+// import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+// /* AUTH */
+// import ProtectedRoute from "./auth/ProtectedRoute";
+// import PublicRoute from "./auth/PublicRoute";
+// import { Toaster } from "react-hot-toast";
+
+// /* LAYOUT */
+// import DashboardLayout from "./layouts/DashboardLayout";
+
+// /* PAGES */
+// import Login from "./pages/Login";
+// import Dashboard from "./pages/Dashboard";
+// import Products from "./pages/Products";
+// import Employees from "./pages/Employees";
+// import ComingSoon from "./pages/ComingSoon";
+
+// /* MASTER DATA */
+// import Category from "./pages/Category";
+// import Brands from "./pages/brands/Brands";
+
+// /* JOB CARDS */
+// import JewelleryJobCard from "./pages/JewelleryJobCard";
+// import GemStoneJobCard from "./pages/GemStoneJobCard";
+// import DimondJobCard from "./pages/DimondJobCard";
+// import OrdersPage from "./pages/OrdersPage";
+// import OrderDetail from "./pages/OrderDetail";
+// import POS from "./pos/POS";
+
+// /* SETTINGS */
+// import SettingsPage from "./pages/settings/SettingsPage";
+// import ProfileSettings from "./pages/settings/components/ProfileSettings";
+// import LogoSettings from "./pages/settings/components/LogoSettings";
+// import SocialMediaSettings from "./pages/settings/components/SocialMediaSettings";
+// import PaymentGatewaySettings from "./pages/settings/components/PaymentGatewaySettings";
+// import VariationSettings from "./pages/settings/components/VariationSettings";
+// import WhatsAppIntegrationSettings from "./pages/settings/components/WhatsAppIntegrationSettings";
+// import CouponSettings from "./pages/settings/components/CouponSettings";
+
+// /* INVOICES */
+// import PrintReceipt from "./pages/PrintReceipt";
+// import POSOrders from "./pages/POSOrders";
+// import POSOrderView from "./pages/POSOrderView";
+// import InvoiceCashMemoList from "./pages/InvoiceCashMemoList";
+// import InvoicePrint from "./pages/InvoicePrint";
+// import InvoiceWithLogoPrint from "./pages/InvoiceWithLogoPrint";
+// import ExtraCharges from "./pages/ExtraCharges";
+// import CashMemoPrint from "./pages/CashMemoPrint";
+// import RateCard from "./pages/RateCard";
+
+// /* CONFIRMATION */
+// import Confirmation from "./pages/Confirmation";
+// import ConfirmationList from "./pages/ConfirmationList";
+// import JobConfirmation from "./pages/JobConfirmation";
+// import ConfirmationPrint from "./pages/ConfirmationPrint";
+
+// /* AUTH PAGES */
+// import ForgotPassword from "./pages/ForgotPassword";
+// import VerifyOtp from "./pages/VerifyOtp";
+// import ResetPassword from "./pages/ResetPassword";
+
+// /* CONTEXT PROVIDERS */
+// import { LogoSettingsProvider } from "./context/LogoSettingsContext";
+// import { ProfileProvider, useProfile } from "./context/ProfileContext";
+
+// /* BRAND PROTECTED ROUTE */
+// import BrandProtectedRoute from "./auth/BrandProtectedRoute";
+// import CustomerCombinedReport from "./pages/CustomerCombinedReport";
+// import StaffComponent from "./pages/StaffComponent";
+// import StaffAddComponent from "./pages/StaffAddComponent";
+// import StaffAttendanceCalendar from "./pages/StaffAttendanceCalendar";
+// import SuperAdmin from "./pages/components/superadmindashboard/SuperAdmin";
+
+// export default function App() {
+//   return (
+//     <BrowserRouter>
+//       <LogoSettingsProvider>
+//         <ProfileProvider>
+//           <Toaster position="top-right" reverseOrder={false} />
+
+//           <Routes>
+//             {/* ---------------- PUBLIC ---------------- */}
+//             <Route
+//               path="/login"
+//               element={
+//                 <PublicRoute>
+//                   <Login />
+//                 </PublicRoute>
+//               }
+//             />
+//             <Route
+//               path="/forgot-password"
+//               element={
+//                 <PublicRoute>
+//                   <ForgotPassword />
+//                 </PublicRoute>
+//               }
+//             />
+//             <Route
+//               path="/verify-otp"
+//               element={
+//                 <PublicRoute>
+//                   <VerifyOtp />
+//                 </PublicRoute>
+//               }
+//             />
+//             <Route
+//               path="/reset-password"
+//               element={
+//                 <PublicRoute>
+//                   <ResetPassword />
+//                 </PublicRoute>
+//               }
+//             />
+
+//             {/* ---------------- PROTECTED ---------------- */}
+//             <Route
+//               element={
+//                 <ProtectedRoute>
+//                   <DashboardLayout />
+//                 </ProtectedRoute>
+//               }
+//             >
+              
+//               {/* DEFAULT AFTER LOGIN */}
+//               <Route path="/" element={<Navigate to="/dashboard" />} />
+                
+
+//               {/* DASHBOARD */}
+//               <Route path="/dashboard" element={<Dashboard />} />
+//               <Route path="/expenses" element={<ComingSoon />} />
+//               <Route path="/reports" element={<ComingSoon />} />
+//                <Route path="/superAdmin" element={<SuperAdmin/>} />
+
+//               {/* PRODUCTS & MASTER */}
+//               <Route path="/products" element={<Products />} />
+//               <Route path="/categories" element={<Category />} />
+
+//               {/* BRANDS - Protected using context toggle */}
+//               <Route
+//                 path="/brands"
+//                 element={
+//                   <BrandProtectedRoute>
+//                     <Brands />
+//                   </BrandProtectedRoute>
+//                 }
+//               />
+
+//               <Route path="/employees" element={<Employees />} />
+
+//               {/* SETTINGS */}
+//               <Route path="/settings" element={<SettingsPage />}>
+//                 <Route path="profile" element={<ProfileSettings />} />
+//                 <Route path="logo" element={<LogoSettings />} />
+//                 <Route path="social-media" element={<SocialMediaSettings />} />
+//                 <Route
+//                   path="payment-gateway"
+//                   element={<PaymentGatewaySettings />}
+//                 />
+//                 <Route
+//                   path="variation-settings"
+//                   element={<VariationSettings />}
+//                 />
+//                 <Route
+//                   path="whatsapp-integration"
+//                   element={<WhatsAppIntegrationSettings />}
+//                 />
+//                 <Route path="coupons-settings" element={<CouponSettings />} />
+//               </Route>
+
+//               {/* JOB CARDS */}
+
+//               {/* ORDERS */}
+//               <Route path="/orders" element={<POSOrders />} />
+//               <Route path="/pos/orders/:id" element={<POSOrderView />} />
+//               <Route path="/online-orders" element={<OrdersPage />} />
+//               <Route path="/orders/:id" element={<OrderDetail />} />
+//               <Route path="/users" element={<CustomerCombinedReport />} />
+//               <Route path="/my-staff" element={<StaffComponent />} />
+//               <Route path="/add-staff" element={<StaffAddComponent />} />
+//               <Route
+//                 path="/staff-attendance"
+//                 element={<StaffAttendanceCalendar />}
+//               />
+
+//               {/* POS */}
+//               <Route
+//                 path="/pos"
+//                 element={
+//                   <ProtectedRoute>
+//                     <POS />
+//                   </ProtectedRoute>
+//                 }
+//               />
+//             </Route>
+
+//             {/* ---------------- FALLBACK ---------------- */}
+//             <Route path="*" element={<Navigate to="/login" />} />
+//           </Routes>
+//         </ProfileProvider>
+//       </LogoSettingsProvider>
+//     </BrowserRouter>
+//   );
+// }
+
+
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 /* AUTH */
@@ -245,10 +451,7 @@ import ComingSoon from "./pages/ComingSoon";
 import Category from "./pages/Category";
 import Brands from "./pages/brands/Brands";
 
-/* JOB CARDS */
-import JewelleryJobCard from "./pages/JewelleryJobCard";
-import GemStoneJobCard from "./pages/GemStoneJobCard";
-import DimondJobCard from "./pages/DimondJobCard";
+/* ORDERS / POS */
 import OrdersPage from "./pages/OrdersPage";
 import OrderDetail from "./pages/OrderDetail";
 import POS from "./pos/POS";
@@ -263,40 +466,29 @@ import VariationSettings from "./pages/settings/components/VariationSettings";
 import WhatsAppIntegrationSettings from "./pages/settings/components/WhatsAppIntegrationSettings";
 import CouponSettings from "./pages/settings/components/CouponSettings";
 
-/* INVOICES */
-import PrintReceipt from "./pages/PrintReceipt";
-import POSOrders from "./pages/POSOrders";
-import POSOrderView from "./pages/POSOrderView";
-import InvoiceCashMemoList from "./pages/InvoiceCashMemoList";
-import InvoicePrint from "./pages/InvoicePrint";
-import InvoiceWithLogoPrint from "./pages/InvoiceWithLogoPrint";
-import ExtraCharges from "./pages/ExtraCharges";
-import CashMemoPrint from "./pages/CashMemoPrint";
-import RateCard from "./pages/RateCard";
+/* STAFF */
+import StaffComponent from "./pages/StaffComponent";
+import StaffAddComponent from "./pages/StaffAddComponent";
+import StaffAttendanceCalendar from "./pages/StaffAttendanceCalendar";
 
-/* CONFIRMATION */
-import Confirmation from "./pages/Confirmation";
-import ConfirmationList from "./pages/ConfirmationList";
-import JobConfirmation from "./pages/JobConfirmation";
-import ConfirmationPrint from "./pages/ConfirmationPrint";
+/* SUPER ADMIN */
+import SuperAdmin from "./pages/components/superadmindashboard/SuperAdmin";
 
 /* AUTH PAGES */
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyOtp from "./pages/VerifyOtp";
 import ResetPassword from "./pages/ResetPassword";
 
-/* CONTEXT PROVIDERS */
+/* CONTEXT */
 import { LogoSettingsProvider } from "./context/LogoSettingsContext";
-import { ProfileProvider, useProfile } from "./context/ProfileContext";
+import { ProfileProvider } from "./context/ProfileContext";
 
-/* BRAND PROTECTED ROUTE */
+/* BRAND TOGGLE */
 import BrandProtectedRoute from "./auth/BrandProtectedRoute";
-import CustomerCombinedReport from "./pages/CustomerCombinedReport";
-import StaffComponent from "./pages/StaffComponent";
-import StaffAddComponent from "./pages/StaffAddComponent";
-import StaffAttendanceCalendar from "./pages/StaffAttendanceCalendar";
 
 export default function App() {
+  const role = localStorage.getItem("role");
+
   return (
     <BrowserRouter>
       <LogoSettingsProvider>
@@ -304,7 +496,7 @@ export default function App() {
           <Toaster position="top-right" reverseOrder={false} />
 
           <Routes>
-            {/* ---------------- PUBLIC ---------------- */}
+            {/* ================= PUBLIC ================= */}
             <Route
               path="/login"
               element={
@@ -338,7 +530,7 @@ export default function App() {
               }
             />
 
-            {/* ---------------- PROTECTED ---------------- */}
+            {/* ================= PROTECTED LAYOUT ================= */}
             <Route
               element={
                 <ProtectedRoute>
@@ -346,32 +538,83 @@ export default function App() {
                 </ProtectedRoute>
               }
             >
-              {/* DEFAULT AFTER LOGIN */}
-              <Route path="/" element={<Navigate to="/dashboard" />} />
-
-              {/* DASHBOARD */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/expenses" element={<ComingSoon />} />
-              <Route path="/reports" element={<ComingSoon />} />
-
-              {/* PRODUCTS & MASTER */}
-              <Route path="/products" element={<Products />} />
-              <Route path="/categories" element={<Category />} />
-
-              {/* BRANDS - Protected using context toggle */}
+              {/* ===== ROLE BASED DEFAULT REDIRECT ===== */}
               <Route
-                path="/brands"
+                path="/"
                 element={
-                  <BrandProtectedRoute>
-                    <Brands />
-                  </BrandProtectedRoute>
+                  role === "super_admin" ? (
+                    <Navigate to="/super-admin" replace />
+                  ) : (
+                    <Navigate to="/dashboard" replace />
+                  )
                 }
               />
 
-              <Route path="/employees" element={<Employees />} />
+              {/* ================= SUPER ADMIN ================= */}
+              <Route
+                path="/super-admin"
+                element={
+                  <ProtectedRoute allowedRoles={["super_admin"]}>
+                    <SuperAdmin />
+                  </ProtectedRoute>
+                }
+              />
 
-              {/* SETTINGS */}
-              <Route path="/settings" element={<SettingsPage />}>
+              {/* ================= ADMIN / STAFF ================= */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={["admin", "staff"]}>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/products"
+                element={
+                  <ProtectedRoute allowedRoles={["admin", "staff"]}>
+                    <Products />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/categories"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <Category />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/brands"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <Brands />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/employees"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <Employees />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* ================= SETTINGS ================= */}
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <SettingsPage />
+                  </ProtectedRoute>
+                }
+              >
                 <Route path="profile" element={<ProfileSettings />} />
                 <Route path="logo" element={<LogoSettings />} />
                 <Route path="social-media" element={<SocialMediaSettings />} />
@@ -387,37 +630,73 @@ export default function App() {
                   path="whatsapp-integration"
                   element={<WhatsAppIntegrationSettings />}
                 />
-                <Route path="coupons-settings" element={<CouponSettings />} />
+                <Route
+                  path="coupons-settings"
+                  element={<CouponSettings />}
+                />
               </Route>
 
-              {/* JOB CARDS */}
-
-              {/* ORDERS */}
-              <Route path="/orders" element={<POSOrders />} />
-              <Route path="/pos/orders/:id" element={<POSOrderView />} />
-              <Route path="/online-orders" element={<OrdersPage />} />
-              <Route path="/orders/:id" element={<OrderDetail />} />
-              <Route path="/users" element={<CustomerCombinedReport />} />
-              <Route path="/my-staff" element={<StaffComponent />} />
-              <Route path="/add-staff" element={<StaffAddComponent />} />
+              {/* ================= ORDERS ================= */}
               <Route
-                path="/staff-attendance"
-                element={<StaffAttendanceCalendar />}
+                path="/online-orders"
+                element={
+                  <ProtectedRoute allowedRoles={["admin", "staff"]}>
+                    <OrdersPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/orders/:id"
+                element={
+                  <ProtectedRoute allowedRoles={["admin", "staff"]}>
+                    <OrderDetail />
+                  </ProtectedRoute>
+                }
               />
 
-              {/* POS */}
+              {/* ================= STAFF ================= */}
+              <Route
+                path="/my-staff"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <StaffComponent />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/add-staff"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <StaffAddComponent />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/staff-attendance"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <StaffAttendanceCalendar />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* ================= POS ================= */}
               <Route
                 path="/pos"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={["admin", "staff"]}>
                     <POS />
                   </ProtectedRoute>
                 }
               />
+
+              {/* ================= MISC ================= */}
+              <Route path="/expenses" element={<ComingSoon />} />
+              <Route path="/reports" element={<ComingSoon />} />
             </Route>
 
-            {/* ---------------- FALLBACK ---------------- */}
-            <Route path="*" element={<Navigate to="/login" />} />
+            {/* ================= FALLBACK ================= */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </ProfileProvider>
       </LogoSettingsProvider>

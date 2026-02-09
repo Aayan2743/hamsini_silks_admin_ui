@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import SuperAdmin from "../../components/superadmindashboard/SuperAdmin";
 
 const menu = [
   { label: "Profile", path: "/settings/profile" },
@@ -10,7 +11,6 @@ const menu = [
   // { label: "account-settings", path: "/settings/account-settings" },
   { label: "coupons-settings", path: "/settings/coupons-settings" },
   // { label: "Settings", path: "" },
-
 ];
 export default function SettingsSidebar() {
   return (
