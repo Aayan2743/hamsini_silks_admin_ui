@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import SettingsLayout from "../SettingsLayout";
 import api from "../../../api/axios";
@@ -9,15 +8,16 @@ import {
   Instagram,
   Twitter,
   Youtube,
+  Facebook,
   Link as LinkIcon,
 } from "lucide-react";
 
 const SOCIALS = [
   { key: "linkedin", label: "LinkedIn", icon: Linkedin },
-  { key: "dribbble", label: "Dribbble", icon: Dribbble },
+  { key: "youtube", label: "YouTube", icon: Youtube },
+  { key: "dribbble", label: "facebook", icon: Facebook },
   { key: "instagram", label: "Instagram", icon: Instagram },
   { key: "twitter", label: "Twitter (X)", icon: Twitter },
-  { key: "youtube", label: "YouTube", icon: Youtube },
 ];
 
 export default function SocialMediaSettings() {
@@ -36,9 +36,7 @@ export default function SocialMediaSettings() {
   const fetchSocialLinks = async () => {
     try {
       setLoading(true);
-      const res = await api.get(
-        "/admin-dashboard/social-media-settings"
-      );
+      const res = await api.get("/admin-dashboard/social-media-settings");
 
       if (res.data?.success === false) {
         toast.error(res.data?.message || "Failed to load social media");
@@ -55,9 +53,7 @@ export default function SocialMediaSettings() {
         });
       }
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Failed to load social media"
-      );
+      toast.error(err.response?.data?.errors || "Failed to load social media");
     } finally {
       setLoading(false);
     }
@@ -87,7 +83,7 @@ export default function SocialMediaSettings() {
       });
 
       const res = await api.post(
-        `/admin-dashboard/social-media-settings?${params.toString()}`
+        `/admin-dashboard/social-media-settings?${params.toString()}`,
       );
 
       if (res.data?.success === false) {
@@ -95,16 +91,12 @@ export default function SocialMediaSettings() {
         return;
       }
 
-      toast.success(
-        res.data?.message || "Social media settings updated"
-      );
+      toast.success(res.data?.message || "Social media settings updated");
 
       setEditMode(false);
       fetchSocialLinks();
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Update failed"
-      );
+      toast.error(err.response?.data?.errors || "Update failed");
     }
   };
 
@@ -206,4 +198,3 @@ export default function SocialMediaSettings() {
     </SettingsLayout>
   );
 }
-

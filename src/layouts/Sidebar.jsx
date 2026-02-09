@@ -218,8 +218,8 @@ export default function Sidebar({ open, setOpen, logout }) {
           {/* <Item to="/online-orders" icon={Package} label="Online Orders" /> */}
           {/* <Item to="/reports" icon={BarChart} label="Reports" /> */}
           <Item to="/users" icon={Users} label="Users" />
-          <Item to="/my-staff" icon={Users} label="My Staff" />
-          <Item to="/add-staff" icon={Users} label="Add Staff" />
+          {/* <Item to="/my-staff" icon={Users} label="My Staff" /> */}
+          {/* <Item to="/add-staff" icon={Users} label="Add Staff" /> */}
           <Item to="/staff-attendance" icon={Users} label="Staff Attendance" />
           <Item to="/settings/profile" icon={Settings} label="Settings" />
         </nav>
