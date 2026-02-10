@@ -130,7 +130,7 @@ export default function CategoryForm({ data, onClose, onSave }) {
           </div>
 
           {/* PARENT CATEGORY */}
-          <div>
+          {/* <div>
             <label className="text-sm font-medium">Parent Category</label>
             <select
               value={form.parent_id}
@@ -147,7 +147,7 @@ export default function CategoryForm({ data, onClose, onSave }) {
             <p className="text-xs text-gray-500 mt-1">
               Select a parent to create a sub-category
             </p>
-          </div>
+          </div> */}
         </div>
 
         {/* FOOTER */}

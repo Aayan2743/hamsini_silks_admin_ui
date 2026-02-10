@@ -2,10 +2,12 @@
 // import { useNavigate } from "react-router-dom";
 // import api from "../api/axios";
 
+// const STATUS_OPTIONS = ["confirmed", "packing", "shipping", "delivered"];
+
 // export default function POSOrders() {
 //   const navigate = useNavigate();
 
-//   // ================= STATE =================
+//   /* ================= STATE ================= */
 //   const [allOrders, setAllOrders] = useState([]);
 //   const [loading, setLoading] = useState(true);
 
@@ -13,7 +15,7 @@
 //   const [page, setPage] = useState(1);
 //   const [perPage, setPerPage] = useState(10);
 
-//   // ================= FETCH ORDERS =================
+//   /* ================= FETCH ORDERS ================= */
 //   const loadOrders = async () => {
 //     try {
 //       setLoading(true);
@@ -30,28 +32,67 @@
 //     loadOrders();
 //   }, []);
 
-//   // ================= SEARCH =================
+//   /* ================= STATUS UPDATE ================= */
+//   const updateStatus = async (orderId, status) => {
+//     let tracking_id = null;
+
+//     if (status === "shipping") {
+//       tracking_id = prompt("Enter Tracking ID");
+//       if (!tracking_id) return;
+//     }
+
+//     try {
+//       await api.post(`/admin-dashboard/orders/${orderId}/status`, {
+//         status,
+//         tracking_id,
+//       });
+//       loadOrders(); // refresh
+//     } catch (err) {
+//       alert(err.response?.data?.message || "Failed to update status");
+//     }
+//   };
+
+//   /*===============SHIP ROCKET ORDER CREATING==============*/
+
+//   const sendToShiprocket = async (orderId) => {
+//     console.log("order", orderId);
+
+//     const confirmSend = window.confirm(
+//       "Send this order to Shiprocket for shipment?",
+//     );
+//     if (!confirmSend) return;
+
+//     try {
+//       const res = await api.post(
+//         `/admin-dashboard/shiprocket/create/${orderId}`,
+//       );
+
+//       alert(`Shipment created!\nAWB: ${res.data.data.awb_code || "-"}`);
+
+//       loadOrders(); // refresh table
+//     } catch (err) {
+//       alert(
+//         err.response?.data?.message || "Failed to send order to Shiprocket",
+//       );
+//     }
+//   };
+
+//   /* ================= SEARCH ================= */
 //   const filteredOrders = useMemo(() => {
 //     if (!search) return allOrders;
 
 //     const q = search.toLowerCase();
 
 //     return allOrders.filter((o) => {
-//       const productName = o.items?.[0]?.product?.name?.toLowerCase() || "";
-
-//       const customerName = o.user?.name?.toLowerCase() || "";
-//       const customerPhone = String(o.user?.phone || "");
-
 //       return (
 //         String(o.id).includes(q) ||
-//         productName.includes(q) ||
-//         customerName.includes(q) ||
-//         customerPhone.includes(q)
+//         o.user?.name?.toLowerCase().includes(q) ||
+//         String(o.user?.phone || "").includes(q)
 //       );
 //     });
 //   }, [allOrders, search]);
 
-//   // ================= PAGINATION =================
+//   /* ================= PAGINATION (OLD STYLE) ================= */
 //   const totalPages = Math.ceil(filteredOrders.length / perPage);
 
 //   const paginatedOrders = useMemo(() => {
@@ -59,12 +100,11 @@
 //     return filteredOrders.slice(start, start + perPage);
 //   }, [filteredOrders, page, perPage]);
 
-//   // ================= RESET PAGE =================
 //   useEffect(() => {
 //     setPage(1);
 //   }, [search, perPage]);
 
-//   // ================= UI =================
+//   /* ================= UI ================= */
 //   return (
 //     <div className="space-y-4">
 //       {/* HEADER */}
@@ -85,6 +125,8 @@
 //                 <th className="px-4 py-3 text-left">Phone</th>
 //                 <th className="px-4 py-3 text-left">Email</th>
 //                 <th className="px-4 py-3 text-right">Total</th>
+//                 <th className="px-4 py-3 text-right">Shipping</th>
+//                 <th className="px-4 py-3 text-left">Status</th>
 //                 <th className="px-4 py-3 text-left">Action</th>
 //               </tr>
 //             </thead>
@@ -92,7 +134,7 @@
 //             <tbody>
 //               {paginatedOrders.length === 0 && (
 //                 <tr>
-//                   <td colSpan="7" className="text-center py-6 text-gray-400">
+//                   <td colSpan="8" className="text-center py-6 text-gray-400">
 //                     No orders found
 //                   </td>
 //                 </tr>
@@ -114,6 +156,51 @@
 //                     ₹ {o.total_amount}
 //                   </td>
 
+//                   <td className="px-4 py-3 space-y-1">
+//                     <button
+//                       onClick={() => navigate(`/pos/orders/${o.id}`)}
+//                       className="block text-sm text-indigo-600 hover:underline"
+//                     >
+//                       View
+//                     </button>
+
+//                     {!o.shiprocket_order_id ? (
+//                       <button
+//                         onClick={() => sendToShiprocket(o.id)}
+//                         className="block text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
+//                       >
+//                         Send to Shiprocket
+//                       </button>
+//                     ) : (
+//                       <div className="text-xs text-gray-500">
+//                         🚚 Sent
+//                         {o.awb_code && <div>AWB: {o.awb_code}</div>}
+//                       </div>
+//                     )}
+//                   </td>
+
+//                   {/* STATUS DROPDOWN */}
+//                   <td className="px-4 py-3">
+//                     <select
+//                       value={o.status}
+//                       onChange={(e) => updateStatus(o.id, e.target.value)}
+//                       className="border rounded px-2 py-1 text-sm"
+//                     >
+//                       {STATUS_OPTIONS.map((s) => (
+//                         <option key={s} value={s}>
+//                           {s}
+//                         </option>
+//                       ))}
+//                     </select>
+
+//                     {o.tracking_id && (
+//                       <div className="text-xs text-gray-500 mt-1">
+//                         Tracking: {o.tracking_id}
+//                       </div>
+//                     )}
+//                   </td>
+
+//                   {/* ACTION */}
 //                   <td className="px-4 py-3">
 //                     <button
 //                       onClick={() => navigate(`/pos/orders/${o.id}`)}
@@ -129,7 +216,7 @@
 //         </div>
 //       )}
 
-//       {/* PAGINATION */}
+//       {/* ===== OLD PAGINATION UI ===== */}
 //       {!loading && filteredOrders.length > 0 && (
 //         <div className="flex justify-between items-center text-sm">
 //           <div className="flex items-center gap-2">
@@ -184,21 +271,31 @@ export default function POSOrders() {
   const navigate = useNavigate();
 
   /* ================= STATE ================= */
-  const [allOrders, setAllOrders] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
+  /* ================= LOCAL COURIER ================= */
+  const [localOpen, setLocalOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [localCourier, setLocalCourier] = useState({
+    partner: "",
+    awb: "",
+    tracking_url: "",
+    shipping_amount: "",
+  });
+
   /* ================= FETCH ORDERS ================= */
   const loadOrders = async () => {
     try {
       setLoading(true);
       const res = await api.get("/admin-dashboard/orders");
-      setAllOrders(res.data.data || []);
-    } catch (err) {
-      console.error("ORDER LIST ERROR:", err);
+      setOrders(res.data.data || []);
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -208,130 +305,147 @@ export default function POSOrders() {
     loadOrders();
   }, []);
 
-  /* ================= STATUS UPDATE ================= */
-  const updateStatus = async (orderId, status) => {
-    let tracking_id = null;
-
-    if (status === "shipping") {
-      tracking_id = prompt("Enter Tracking ID");
-      if (!tracking_id) return;
-    }
+  /* ================= SHIPROCKET ================= */
+  const sendToShiprocket = async (orderId) => {
+    if (!window.confirm("Send this order to Shiprocket?")) return;
 
     try {
-      await api.post(`/admin-dashboard/orders/${orderId}/status`, {
-        status,
-        tracking_id,
-      });
-      loadOrders(); // refresh
+      const res = await api.post(
+        `/admin-dashboard/shiprocket/create/${orderId}`,
+      );
+
+      alert(`Shipment created!\nAWB: ${res.data.data?.awb_code || "-"}`);
+      loadOrders();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to update status");
+      alert(err.response?.data?.message || "Shiprocket failed");
     }
   };
 
-  /* ================= SEARCH ================= */
-  const filteredOrders = useMemo(() => {
-    if (!search) return allOrders;
+  /* ================= LOCAL COURIER SAVE ================= */
+  const saveLocalCourier = async () => {
+    try {
+      await api.post(
+        `/admin-dashboard/orders/${selectedOrderId}/local-shipping`,
+        localCourier,
+      );
 
+      alert("Local courier added");
+      setLocalOpen(false);
+      setLocalCourier({
+        partner: "",
+        awb: "",
+        tracking_url: "",
+        shipping_amount: "",
+      });
+      loadOrders();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed");
+    }
+  };
+
+  /* ================= FILTER ================= */
+  const filtered = useMemo(() => {
+    if (!search) return orders;
     const q = search.toLowerCase();
-
-    return allOrders.filter((o) => {
-      return (
+    return orders.filter(
+      (o) =>
         String(o.id).includes(q) ||
         o.user?.name?.toLowerCase().includes(q) ||
-        String(o.user?.phone || "").includes(q)
-      );
-    });
-  }, [allOrders, search]);
+        String(o.user?.phone || "").includes(q),
+    );
+  }, [orders, search]);
 
-  /* ================= PAGINATION (OLD STYLE) ================= */
-  const totalPages = Math.ceil(filteredOrders.length / perPage);
-
-  const paginatedOrders = useMemo(() => {
+  /* ================= PAGINATION ================= */
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const paginated = useMemo(() => {
     const start = (page - 1) * perPage;
-    return filteredOrders.slice(start, start + perPage);
-  }, [filteredOrders, page, perPage]);
+    return filtered.slice(start, start + perPage);
+  }, [filtered, page, perPage]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [search, perPage]);
+  /* ================= STATUS BADGE ================= */
+  const shipmentBadge = (status) => {
+    if (!status)
+      return <span className="text-xs text-gray-400">Not shipped</span>;
+    const map = {
+      pending: "bg-gray-200 text-gray-700",
+      created: "bg-blue-100 text-blue-700",
+      shipped: "bg-indigo-100 text-indigo-700",
+      delivered: "bg-green-100 text-green-700",
+      cancelled: "bg-red-100 text-red-700",
+    };
+    return (
+      <span className={`px-2 py-1 rounded text-xs ${map[status]}`}>
+        {status.toUpperCase()}
+      </span>
+    );
+  };
 
   /* ================= UI ================= */
   return (
     <div className="space-y-4">
-      {/* HEADER */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Orders</h1>
-      </div>
+      <h1 className="text-2xl font-semibold">Orders</h1>
 
-      {loading && <p className="text-sm text-gray-500">Loading orders...</p>}
+      <input
+        placeholder="Search by order / name / phone"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="border px-3 py-2 rounded w-64"
+      />
 
-      {!loading && (
-        <div className="bg-white rounded-xl shadow-sm overflow-x-auto">
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="bg-white rounded-xl shadow overflow-x-auto">
           <table className="min-w-full text-sm">
-            <thead className="bg-gray-100 text-gray-600">
+            <thead className="bg-gray-100">
               <tr>
-                <th className="px-4 py-3 text-left">#</th>
-                <th className="px-4 py-3 text-left">Order No</th>
-                <th className="px-4 py-3 text-left">Customer</th>
-                <th className="px-4 py-3 text-left">Phone</th>
-                <th className="px-4 py-3 text-left">Email</th>
-                <th className="px-4 py-3 text-right">Total</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-left">Action</th>
+                <th className="p-3">#</th>
+                <th className="p-3">Order</th>
+                <th className="p-3">Customer</th>
+                <th className="p-3">Phone</th>
+                <th className="p-3 text-right">Total</th>
+                <th className="p-3">ShipRocket Created Status</th>
+                <th className="p-3">Actions</th>
               </tr>
             </thead>
 
             <tbody>
-              {paginatedOrders.length === 0 && (
-                <tr>
-                  <td colSpan="8" className="text-center py-6 text-gray-400">
-                    No orders found
-                  </td>
-                </tr>
-              )}
-
-              {paginatedOrders.map((o, i) => (
-                <tr key={o.id} className="border-t hover:bg-gray-50">
-                  <td className="px-4 py-3">{(page - 1) * perPage + i + 1}</td>
-
-                  <td className="px-4 py-3 font-medium">ORD-{o.id}</td>
-
-                  <td className="px-4 py-3">{o.user?.name || "Walk-in"}</td>
-
-                  <td className="px-4 py-3">{o.user?.phone || "-"}</td>
-
-                  <td className="px-4 py-3">{o.user?.email || "-"}</td>
-
-                  <td className="px-4 py-3 text-right font-semibold">
+              {paginated.map((o, i) => (
+                <tr key={o.id} className="border-t">
+                  <td className="p-3">{(page - 1) * perPage + i + 1}</td>
+                  <td className="p-3 font-medium">ORD-{o.id}</td>
+                  <td className="p-3">{o.user?.name}</td>
+                  <td className="p-3">{o.user?.phone}</td>
+                  <td className="p-3 text-right font-semibold">
                     ₹ {o.total_amount}
                   </td>
 
-                  {/* STATUS DROPDOWN */}
-                  <td className="px-4 py-3">
-                    <select
-                      value={o.status}
-                      onChange={(e) => updateStatus(o.id, e.target.value)}
-                      className="border rounded px-2 py-1 text-sm"
-                    >
-                      {STATUS_OPTIONS.map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </select>
-
-                    {o.tracking_id && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        Tracking: {o.tracking_id}
-                      </div>
+                  <td className="p-3 space-y-1">
+                    {shipmentBadge(o.shipment_status)}
+                    {shipmentBadge(o.shiprocket_order_id)}
+                    {o.awb_code && (
+                      <div className="text-xs">AWB: {o.awb_code}</div>
                     )}
                   </td>
 
-                  {/* ACTION */}
-                  <td className="px-4 py-3">
+                  <td className="p-3 space-y-2">
+                    {!o.shiprocket_order_id && (
+                      <>
+                        <button
+                          onClick={() => {
+                            setSelectedOrderId(o.id);
+                            setLocalOpen(true);
+                          }}
+                          className="block w-full bg-orange-600 text-white text-xs px-2 py-1 rounded"
+                        >
+                          Local Courier
+                        </button>
+                      </>
+                    )}
+
                     <button
                       onClick={() => navigate(`/pos/orders/${o.id}`)}
-                      className="text-sm text-indigo-600 hover:underline"
+                      className="block text-xs text-indigo-600"
                     >
                       View
                     </button>
@@ -343,44 +457,69 @@ export default function POSOrders() {
         </div>
       )}
 
-      {/* ===== OLD PAGINATION UI ===== */}
-      {!loading && filteredOrders.length > 0 && (
-        <div className="flex justify-between items-center text-sm">
-          <div className="flex items-center gap-2">
-            <span>Rows:</span>
-            <select
-              value={perPage}
-              onChange={(e) => setPerPage(Number(e.target.value))}
-              className="border rounded px-2 py-1"
-            >
-              {[5, 10, 15, 25].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-          </div>
+      {/* PAGINATION */}
+      <div className="flex justify-between">
+        <select
+          value={perPage}
+          onChange={(e) => setPerPage(+e.target.value)}
+          className="border px-2 py-1"
+        >
+          {[5, 10, 20].map((n) => (
+            <option key={n}>{n}</option>
+          ))}
+        </select>
 
-          <div className="flex items-center gap-2">
-            <button
-              disabled={page === 1}
-              onClick={() => setPage(page - 1)}
-              className="px-3 py-1 border rounded disabled:opacity-40"
-            >
-              Prev
-            </button>
+        <div className="space-x-2">
+          <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+            Prev
+          </button>
+          <span>
+            {page}/{totalPages || 1}
+          </span>
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
+          >
+            Next
+          </button>
+        </div>
+      </div>
 
-            <span>
-              Page {page} / {totalPages || 1}
-            </span>
+      {/* LOCAL COURIER POPUP */}
+      {localOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white w-96 rounded-xl p-6 space-y-3">
+            <h3 className="font-semibold text-lg">Local Courier</h3>
 
-            <button
-              disabled={page === totalPages}
-              onClick={() => setPage(page + 1)}
-              className="px-3 py-1 border rounded disabled:opacity-40"
-            >
-              Next
-            </button>
+            {["partner", "awb", "tracking_url", "shipping_amount"].map((f) => (
+              <input
+                key={f}
+                placeholder={f.replace("_", " ")}
+                value={localCourier[f]}
+                onChange={(e) =>
+                  setLocalCourier({
+                    ...localCourier,
+                    [f]: e.target.value,
+                  })
+                }
+                className="w-full border px-3 py-2 rounded"
+              />
+            ))}
+
+            <div className="flex gap-3">
+              <button
+                onClick={saveLocalCourier}
+                className="flex-1 bg-black text-white py-2 rounded"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setLocalOpen(false)}
+                className="flex-1 border py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

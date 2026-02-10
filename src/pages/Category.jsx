@@ -59,7 +59,7 @@ export default function Category() {
     const parents = categories.filter(
       (c) =>
         !c.parent_id &&
-        c.name.toLowerCase().includes(parentSearch.toLowerCase())
+        c.name.toLowerCase().includes(parentSearch.toLowerCase()),
     );
 
     setParentSuggestions(parents);
@@ -109,9 +109,7 @@ export default function Category() {
   /* ================= FILTER RESULT ================= */
   const displayedCategories = selectedParent
     ? categories.filter(
-        (c) =>
-          c.id === selectedParent.id ||
-          c.parent_id === selectedParent.id
+        (c) => c.id === selectedParent.id || c.parent_id === selectedParent.id,
       )
     : categories;
 

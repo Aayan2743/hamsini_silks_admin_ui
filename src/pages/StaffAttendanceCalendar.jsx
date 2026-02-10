@@ -1,37 +1,13 @@
-// import { useMemo, useState } from "react";
-
-// /* ================= MOCK STAFF ================= */
-// const INITIAL_STAFF = [
-//   {
-//     id: 1,
-//     name: "Arun",
-//     phone: "9876543210",
-//     email: "arun@mail.com",
-//     role: "Staff",
-//   },
-//   {
-//     id: 2,
-//     name: "Sneha",
-//     phone: "9123456780",
-//     email: "sneha@mail.com",
-//     role: "Staff",
-//   },
-//   {
-//     id: 3,
-//     name: "Rahul",
-//     phone: "9988776655",
-//     email: "rahul@mail.com",
-//     role: "Manager",
-//   },
-// ];
+// import { useEffect, useMemo, useState } from "react";
+// import api from "../api/axios";
 
 // export default function StaffAttendanceCalendar() {
 //   /* ================= TAB ================= */
 //   const [activeTab, setActiveTab] = useState("attendance");
 
 //   /* ================= STAFF ================= */
-//   const [staffList, setStaffList] = useState(INITIAL_STAFF);
-//   const [selectedStaff, setSelectedStaff] = useState(INITIAL_STAFF[0].id);
+//   const [staffList, setStaffList] = useState([]);
+//   const [selectedStaff, setSelectedStaff] = useState(null);
 
 //   /* ================= ADD STAFF DRAWER ================= */
 //   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -42,20 +18,8 @@
 //     role: "Staff",
 //   });
 
-//   const addStaff = () => {
-//     if (!staffForm.name || !staffForm.phone || !staffForm.email) return;
-//     setStaffList((prev) => [...prev, { id: Date.now(), ...staffForm }]);
-//     setStaffForm({ name: "", phone: "", email: "", role: "Staff" });
-//     setDrawerOpen(false);
-//   };
-
 //   /* ================= ATTENDANCE ================= */
-//   const [attendance, setAttendance] = useState({
-//     1: {
-//       "2026-02-01": { status: "present", inTime: "09:30", outTime: "18:00" },
-//     },
-//   });
-
+//   const [attendance, setAttendance] = useState({});
 //   const [currentMonth, setCurrentMonth] = useState(new Date());
 //   const [popupOpen, setPopupOpen] = useState(false);
 //   const [selectedDay, setSelectedDay] = useState(null);
@@ -64,6 +28,45 @@
 //     inTime: "",
 //     outTime: "",
 //   });
+
+//   /* ================= FETCH STAFF (API) ================= */
+//   const fetchStaff = async () => {
+//     try {
+//       const res = await api.get("/admin-dashboard/staff");
+//       setStaffList(res.data.data);
+
+//       if (res.data.data.length && !selectedStaff) {
+//         setSelectedStaff(res.data.data[0].id);
+//       }
+//     } catch (err) {
+//       console.error("Failed to fetch staff", err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchStaff();
+//   }, []);
+
+//   /* ================= ADD STAFF (API) ================= */
+//   const addStaff = async () => {
+//     if (!staffForm.name || !staffForm.phone || !staffForm.email) return;
+
+//     try {
+//       await api.post("/admin-dashboard/add-staff", {
+//         name: staffForm.name,
+//         email: staffForm.email,
+//         phone: staffForm.phone,
+//         password: "default@123",
+//         role: staffForm.role === "Manager" ? "employeer" : "employee",
+//       });
+
+//       setDrawerOpen(false);
+//       setStaffForm({ name: "", phone: "", email: "", role: "Staff" });
+//       fetchStaff();
+//     } catch (err) {
+//       alert(err.response?.data?.error || "Failed to add staff");
+//     }
+//   };
 
 //   /* ================= CALENDAR LOGIC ================= */
 //   const year = currentMonth.getFullYear();
@@ -80,9 +83,12 @@
 //   }, [firstDay, daysInMonth]);
 
 //   const formatDate = (day) =>
-//     `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+//     `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(
+//       2,
+//       "0",
+//     )}`;
 
-//   /* ================= POPUP ================= */
+//   /* ================= ATTENDANCE POPUP ================= */
 //   const openPopup = (day) => {
 //     const existing = attendance[selectedStaff]?.[formatDate(day)];
 //     setSelectedDay(day);
@@ -115,7 +121,7 @@
 //   /* ================= UI ================= */
 //   return (
 //     <div className="space-y-4 relative">
-//       {/* TABS */}
+//       {/* ================= TABS ================= */}
 //       <div className="flex gap-2 border-b">
 //         {["attendance", "staff"].map((tab) => (
 //           <button
@@ -135,7 +141,7 @@
 //         <>
 //           <div className="flex gap-3 items-center">
 //             <select
-//               value={selectedStaff}
+//               value={selectedStaff || ""}
 //               onChange={(e) => setSelectedStaff(Number(e.target.value))}
 //               className="border rounded px-3 py-2 text-sm"
 //             >
@@ -246,7 +252,6 @@
 //               {formatDate(selectedDay)}
 //             </h3>
 
-//             {/* Attendance Type */}
 //             <div className="flex flex-col gap-1">
 //               <label className="text-sm font-medium text-gray-700">
 //                 Attendance Type
@@ -259,7 +264,7 @@
 //                     status: e.target.value,
 //                   })
 //                 }
-//                 className="border rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-black"
+//                 className="border px-3 py-2 rounded"
 //               >
 //                 <option value="present">Present</option>
 //                 <option value="absent">Absent</option>
@@ -267,7 +272,6 @@
 //               </select>
 //             </div>
 
-//             {/* In Time */}
 //             <div className="flex flex-col gap-1">
 //               <label className="text-sm font-medium text-gray-700">
 //                 In Time
@@ -281,11 +285,10 @@
 //                     inTime: e.target.value,
 //                   })
 //                 }
-//                 className="border rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-black"
+//                 className="border px-3 py-2 rounded"
 //               />
 //             </div>
 
-//             {/* Out Time */}
 //             <div className="flex flex-col gap-1">
 //               <label className="text-sm font-medium text-gray-700">
 //                 Out Time
@@ -299,21 +302,20 @@
 //                     outTime: e.target.value,
 //                   })
 //                 }
-//                 className="border rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-black"
+//                 className="border px-3 py-2 rounded"
 //               />
 //             </div>
 
-//             {/* Buttons */}
 //             <div className="flex gap-3 pt-3">
 //               <button
 //                 onClick={saveAttendance}
-//                 className="flex-1 bg-black text-white py-2 rounded-md"
+//                 className="flex-1 bg-black text-white py-2 rounded"
 //               >
 //                 Save
 //               </button>
 //               <button
 //                 onClick={() => setPopupOpen(false)}
-//                 className="flex-1 border py-2 rounded-md"
+//                 className="flex-1 border py-2 rounded"
 //               >
 //                 Cancel
 //               </button>
@@ -325,90 +327,47 @@
 //       {/* ================= STAFF DRAWER ================= */}
 //       {drawerOpen && (
 //         <div className="fixed inset-0 z-40 flex">
-//           {/* Overlay */}
 //           <div
 //             className="flex-1 bg-black/40"
 //             onClick={() => setDrawerOpen(false)}
 //           />
 
-//           {/* Drawer */}
 //           <div className="w-96 bg-white h-full shadow-xl p-6 space-y-5">
-//             {/* Header */}
-//             <div className="flex items-center justify-between">
-//               <h3 className="text-lg font-semibold">Add Staff</h3>
-//               <button
-//                 onClick={() => setDrawerOpen(false)}
-//                 className="text-gray-500 hover:text-black"
-//               >
-//                 ✕
-//               </button>
-//             </div>
+//             <h3 className="text-lg font-semibold">Add Staff</h3>
 
-//             {/* Name */}
-//             <div className="flex flex-col gap-1">
-//               <label className="text-sm font-medium text-gray-700">Name</label>
+//             {["name", "phone", "email"].map((f) => (
 //               <input
-//                 value={staffForm.name}
+//                 key={f}
+//                 placeholder={f}
+//                 value={staffForm[f]}
 //                 onChange={(e) =>
-//                   setStaffForm({ ...staffForm, name: e.target.value })
+//                   setStaffForm({ ...staffForm, [f]: e.target.value })
 //                 }
-//                 placeholder="Enter full name"
-//                 className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-black"
+//                 className="w-full border px-3 py-2 rounded"
 //               />
-//             </div>
+//             ))}
 
-//             {/* Phone */}
-//             <div className="flex flex-col gap-1">
-//               <label className="text-sm font-medium text-gray-700">Phone</label>
-//               <input
-//                 value={staffForm.phone}
-//                 onChange={(e) =>
-//                   setStaffForm({ ...staffForm, phone: e.target.value })
-//                 }
-//                 placeholder="Enter phone number"
-//                 className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-black"
-//               />
-//             </div>
+//             <select
+//               value={staffForm.role}
+//               onChange={(e) =>
+//                 setStaffForm({ ...staffForm, role: e.target.value })
+//               }
+//               className="w-full border px-3 py-2 rounded"
+//             >
+//               <option>Staff</option>
+//               <option>Manager</option>
+//             </select>
 
-//             {/* Email */}
-//             <div className="flex flex-col gap-1">
-//               <label className="text-sm font-medium text-gray-700">Email</label>
-//               <input
-//                 value={staffForm.email}
-//                 onChange={(e) =>
-//                   setStaffForm({ ...staffForm, email: e.target.value })
-//                 }
-//                 placeholder="Enter email address"
-//                 className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-black"
-//               />
-//             </div>
-
-//             {/* Role */}
-//             <div className="flex flex-col gap-1">
-//               <label className="text-sm font-medium text-gray-700">Role</label>
-//               <select
-//                 value={staffForm.role}
-//                 onChange={(e) =>
-//                   setStaffForm({ ...staffForm, role: e.target.value })
-//                 }
-//                 className="w-full border px-3 py-2 rounded bg-white focus:outline-none focus:ring-2 focus:ring-black"
-//               >
-//                 <option value="Staff">Staff</option>
-//                 <option value="Manager">Manager</option>
-//               </select>
-//             </div>
-
-//             {/* Actions */}
-//             <div className="flex gap-3 pt-4">
+//             <div className="flex gap-3">
 //               <button
 //                 onClick={addStaff}
-//                 className="flex-1 bg-black text-white py-2 rounded-md hover:opacity-90"
+//                 className="flex-1 bg-black text-white py-2 rounded"
 //               >
 //                 Save
 //               </button>
 //               <button
 //                 onClick={() => setDrawerOpen(false)}
-//                 className="flex-1 border py-2 rounded-md hover:bg-gray-50"
+//                 className="flex-1 border py-2 rounded"
 //               >
 //                 Cancel
 //               </button>
@@ -451,7 +410,7 @@ export default function StaffAttendanceCalendar() {
     outTime: "",
   });
 
-  /* ================= FETCH STAFF (API) ================= */
+  /* ================= FETCH STAFF ================= */
   const fetchStaff = async () => {
     try {
       const res = await api.get("/admin-dashboard/staff");
@@ -469,15 +428,18 @@ export default function StaffAttendanceCalendar() {
     fetchStaff();
   }, []);
 
-  /* ================= ADD STAFF (API) ================= */
+  /* ================= ADD STAFF ================= */
   const addStaff = async () => {
-    if (!staffForm.name || !staffForm.phone || !staffForm.email) return;
+    if (!staffForm.name || !staffForm.phone || !staffForm.email) {
+      alert("Please fill all required fields");
+      return;
+    }
 
     try {
       await api.post("/admin-dashboard/add-staff", {
         name: staffForm.name,
-        email: staffForm.email,
         phone: staffForm.phone,
+        email: staffForm.email,
         password: "default@123",
         role: staffForm.role === "Manager" ? "employeer" : "employee",
       });
@@ -486,7 +448,11 @@ export default function StaffAttendanceCalendar() {
       setStaffForm({ name: "", phone: "", email: "", role: "Staff" });
       fetchStaff();
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to add staff");
+      if (err.response?.status === 422) {
+        alert(err.response.data.error || "Validation error");
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
     }
   };
 
@@ -510,26 +476,74 @@ export default function StaffAttendanceCalendar() {
       "0",
     )}`;
 
+  /* ================= FETCH ATTENDANCE ================= */
+  useEffect(() => {
+    if (!selectedStaff) return;
+
+    const fetchAttendance = async () => {
+      try {
+        const res = await api.get("/admin-dashboard/attendance", {
+          params: {
+            user_id: selectedStaff,
+            month: `${year}-${String(month + 1).padStart(2, "0")}`,
+          },
+        });
+
+        setAttendance((prev) => ({
+          ...prev,
+          [selectedStaff]: res.data.data,
+        }));
+      } catch (err) {
+        console.error("Failed to fetch attendance", err);
+      }
+    };
+
+    fetchAttendance();
+  }, [selectedStaff, currentMonth]);
+
   /* ================= ATTENDANCE POPUP ================= */
   const openPopup = (day) => {
     const existing = attendance[selectedStaff]?.[formatDate(day)];
+
     setSelectedDay(day);
     setAttendanceForm(
-      existing || { status: "present", inTime: "", outTime: "" },
+      existing
+        ? {
+            status: existing.status,
+            inTime: existing.in_time || "",
+            outTime: existing.out_time || "",
+          }
+        : { status: "present", inTime: "", outTime: "" },
     );
     setPopupOpen(true);
   };
 
-  const saveAttendance = () => {
-    const dateKey = formatDate(selectedDay);
-    setAttendance((prev) => ({
-      ...prev,
-      [selectedStaff]: {
-        ...prev[selectedStaff],
-        [dateKey]: attendanceForm,
-      },
-    }));
-    setPopupOpen(false);
+  const saveAttendance = async () => {
+    try {
+      await api.post("/admin-dashboard/attendance", {
+        user_id: selectedStaff,
+        date: formatDate(selectedDay),
+        status: attendanceForm.status,
+        in_time: attendanceForm.inTime,
+        out_time: attendanceForm.outTime,
+      });
+
+      setAttendance((prev) => ({
+        ...prev,
+        [selectedStaff]: {
+          ...prev[selectedStaff],
+          [formatDate(selectedDay)]: {
+            status: attendanceForm.status,
+            in_time: attendanceForm.inTime,
+            out_time: attendanceForm.outTime,
+          },
+        },
+      }));
+
+      setPopupOpen(false);
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to save attendance");
+    }
   };
 
   const getStatusColor = (obj) => {
@@ -543,7 +557,7 @@ export default function StaffAttendanceCalendar() {
   /* ================= UI ================= */
   return (
     <div className="space-y-4 relative">
-      {/* ================= TABS ================= */}
+      {/* TABS */}
       <div className="flex gap-2 border-b">
         {["attendance", "staff"].map((tab) => (
           <button
@@ -666,27 +680,37 @@ export default function StaffAttendanceCalendar() {
         </>
       )}
 
-      {/* ================= ATTENDANCE POPUP ================= */}
+      {/* ================= POPUP ================= */}
       {popupOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white w-80 rounded-xl p-5 space-y-4 shadow-xl">
-            <h3 className="text-lg font-semibold text-center">
-              {formatDate(selectedDay)}
-            </h3>
+          <div className="bg-white w-96 rounded-2xl p-6 space-y-5 shadow-xl">
+            {/* HEADER */}
+            <div className="text-center">
+              <h3 className="text-lg font-semibold">
+                {new Date(formatDate(selectedDay)).toLocaleDateString("en-US", {
+                  weekday: "long",
+                })}
+              </h3>
+              <p className="text-sm text-gray-500">{formatDate(selectedDay)}</p>
+            </div>
 
+            {/* STATUS */}
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium text-gray-700">
-                Attendance Type
+                Attendance Status
               </label>
               <select
                 value={attendanceForm.status}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const status = e.target.value;
                   setAttendanceForm({
                     ...attendanceForm,
-                    status: e.target.value,
-                  })
-                }
-                className="border px-3 py-2 rounded"
+                    status,
+                    inTime: status === "present" ? attendanceForm.inTime : "",
+                    outTime: status === "present" ? attendanceForm.outTime : "",
+                  });
+                }}
+                className="border px-3 py-2 rounded-lg w-full"
               >
                 <option value="present">Present</option>
                 <option value="absent">Absent</option>
@@ -694,6 +718,7 @@ export default function StaffAttendanceCalendar() {
               </select>
             </div>
 
+            {/* IN TIME */}
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium text-gray-700">
                 In Time
@@ -701,16 +726,22 @@ export default function StaffAttendanceCalendar() {
               <input
                 type="time"
                 value={attendanceForm.inTime}
+                disabled={attendanceForm.status !== "present"}
                 onChange={(e) =>
                   setAttendanceForm({
                     ...attendanceForm,
                     inTime: e.target.value,
                   })
                 }
-                className="border px-3 py-2 rounded"
+                className={`border px-3 py-2 rounded-lg w-full ${
+                  attendanceForm.status !== "present"
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : ""
+                }`}
               />
             </div>
 
+            {/* OUT TIME */}
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium text-gray-700">
                 Out Time
@@ -718,26 +749,32 @@ export default function StaffAttendanceCalendar() {
               <input
                 type="time"
                 value={attendanceForm.outTime}
+                disabled={attendanceForm.status !== "present"}
                 onChange={(e) =>
                   setAttendanceForm({
                     ...attendanceForm,
                     outTime: e.target.value,
                   })
                 }
-                className="border px-3 py-2 rounded"
+                className={`border px-3 py-2 rounded-lg w-full ${
+                  attendanceForm.status !== "present"
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : ""
+                }`}
               />
             </div>
 
+            {/* ACTIONS */}
             <div className="flex gap-3 pt-3">
               <button
                 onClick={saveAttendance}
-                className="flex-1 bg-black text-white py-2 rounded"
+                className="flex-1 bg-black text-white py-2 rounded-lg font-medium hover:opacity-90"
               >
                 Save
               </button>
               <button
                 onClick={() => setPopupOpen(false)}
-                className="flex-1 border py-2 rounded"
+                className="flex-1 border py-2 rounded-lg hover:bg-gray-50"
               >
                 Cancel
               </button>
@@ -746,50 +783,99 @@ export default function StaffAttendanceCalendar() {
         </div>
       )}
 
-      {/* ================= STAFF DRAWER ================= */}
+      {/* ================= DRAWER ================= */}
       {drawerOpen && (
         <div className="fixed inset-0 z-40 flex">
+          {/* OVERLAY */}
           <div
             className="flex-1 bg-black/40"
             onClick={() => setDrawerOpen(false)}
           />
 
-          <div className="w-96 bg-white h-full shadow-xl p-6 space-y-5">
-            <h3 className="text-lg font-semibold">Add Staff</h3>
+          {/* DRAWER */}
+          <div className="w-96 bg-white h-full shadow-2xl p-6 space-y-6">
+            {/* HEADER */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Add Staff</h3>
+              <button
+                onClick={() => setDrawerOpen(false)}
+                className="text-gray-500 hover:text-black"
+              >
+                ✕
+              </button>
+            </div>
 
-            {["name", "phone", "email"].map((f) => (
+            {/* NAME */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-gray-700">
+                Full Name
+              </label>
               <input
-                key={f}
-                placeholder={f}
-                value={staffForm[f]}
+                placeholder="Enter staff name"
+                value={staffForm.name}
                 onChange={(e) =>
-                  setStaffForm({ ...staffForm, [f]: e.target.value })
+                  setStaffForm({ ...staffForm, name: e.target.value })
                 }
-                className="w-full border px-3 py-2 rounded"
+                className="border px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-black outline-none"
               />
-            ))}
+            </div>
 
-            <select
-              value={staffForm.role}
-              onChange={(e) =>
-                setStaffForm({ ...staffForm, role: e.target.value })
-              }
-              className="w-full border px-3 py-2 rounded"
-            >
-              <option>Staff</option>
-              <option>Manager</option>
-            </select>
+            {/* PHONE */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-gray-700">
+                Phone Number
+              </label>
+              <input
+                placeholder="Enter phone number"
+                value={staffForm.phone}
+                onChange={(e) =>
+                  setStaffForm({ ...staffForm, phone: e.target.value })
+                }
+                className="border px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-black outline-none"
+              />
+            </div>
 
-            <div className="flex gap-3">
+            {/* EMAIL */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-gray-700">
+                Email Address
+              </label>
+              <input
+                placeholder="Enter email address"
+                value={staffForm.email}
+                onChange={(e) =>
+                  setStaffForm({ ...staffForm, email: e.target.value })
+                }
+                className="border px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-black outline-none"
+              />
+            </div>
+
+            {/* ROLE */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-gray-700">Role</label>
+              <select
+                value={staffForm.role}
+                onChange={(e) =>
+                  setStaffForm({ ...staffForm, role: e.target.value })
+                }
+                className="border px-3 py-2 rounded-lg w-full bg-white focus:ring-2 focus:ring-black outline-none"
+              >
+                <option>Staff</option>
+                <option>Manager</option>
+              </select>
+            </div>
+
+            {/* ACTIONS */}
+            <div className="flex gap-3 pt-4">
               <button
                 onClick={addStaff}
-                className="flex-1 bg-black text-white py-2 rounded"
+                className="flex-1 bg-black text-white py-2 rounded-lg font-medium hover:opacity-90"
               >
                 Save
               </button>
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="flex-1 border py-2 rounded"
+                className="flex-1 border py-2 rounded-lg hover:bg-gray-50"
               >
                 Cancel
               </button>
