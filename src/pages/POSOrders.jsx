@@ -431,7 +431,7 @@ export default function POSOrders() {
                   <td className="p-3 space-y-2">
                     {!o.shiprocket_order_id && (
                       <>
-                        <button
+                        {/* <button
                           onClick={() => {
                             setSelectedOrderId(o.id);
                             setLocalOpen(true);
@@ -439,7 +439,7 @@ export default function POSOrders() {
                           className="block w-full bg-orange-600 text-white text-xs px-2 py-1 rounded"
                         >
                           Local Courier
-                        </button>
+                        </button> */}
                       </>
                     )}
 

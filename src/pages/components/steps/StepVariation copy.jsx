@@ -184,56 +184,6 @@ const StepVariation = forwardRef(({ productId }, ref) => {
       {loading && <p className="text-sm text-indigo-600">Saving variants…</p>}
     </div>
   );
-
-  // return (
-  //   <div className="bg-white p-6 space-y-8">
-  //     {/* HEADER */}
-  //     <div className="flex justify-between items-center">
-  //       <div>
-  //         <h3 className="text-lg font-semibold text-gray-800">
-  //           Product Variations
-  //         </h3>
-  //         <p className="text-sm text-gray-500">
-  //           Select values to generate variants
-  //         </p>
-  //       </div>
-
-  //       <a
-  //         href="/settings/variation-settings"
-  //         // target="_blank"
-  //         rel="noreferrer"
-  //         className="text-sm text-indigo-600 hover:underline"
-  //       >
-  //         + Add Variation
-  //       </a>
-  //     </div>
-
-  //     {/* VARIATION SELECTS */}
-  //     <div className="grid gap-4 md:grid-cols-2">
-  //       {variations.map((variation) => (
-  //         <VariantSelect
-  //           key={variation.id}
-  //           label={variation.name}
-  //           options={variation.values || []}
-  //           selected={selected[variation.id] || []}
-  //           onChange={(vals) => handleChange(variation.id, vals)}
-  //           disabled={!variation.values?.length}
-  //         />
-  //       ))}
-  //     </div>
-
-  //     {/* VARIANT TABLE */}
-  //     {variants.length > 0 && (
-  //       <VariantTable
-  //         variants={variants}
-  //         data={variantData}
-  //         setData={setVariantData}
-  //       />
-  //     )}
-
-  //     {loading && <p className="text-sm text-indigo-600">Saving variants…</p>}
-  //   </div>
-  // );
 });
 
 export default StepVariation;

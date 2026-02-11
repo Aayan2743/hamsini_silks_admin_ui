@@ -8,10 +8,12 @@ import useDynamicTitle from "../hooks/useDynamicTitle";
 
 export default function Products() {
   useDynamicTitle("Products");
+
+  const [drawerKey, setDrawerKey] = useState(0);
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(5);
+  const [perPage, setPerPage] = useState(10);
 
   const [products, setProducts] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -76,7 +78,11 @@ export default function Products() {
           </button>
 
           <button
-            onClick={() => setOpenAdd(true)}
+            // onClick={() => setOpenAdd(true)}
+            onClick={() => {
+              setDrawerKey((prev) => prev + 1); // force remount
+              setOpenAdd(true);
+            }}
             className="bg-indigo-600 text-white px-4 py-2 rounded-lg"
           >
             + Add Product
@@ -162,6 +168,7 @@ export default function Products() {
                     <button
                       type="button" // ✅ THIS IS THE FIX
                       onClick={() => {
+                        setDrawerKey((prev) => prev + 1); // force remount
                         setSelectedProduct(p);
                         setOpenEdit(true);
                       }}
@@ -240,6 +247,7 @@ export default function Products() {
 
       {/* DRAWERS */}
       <AddProductDrawer
+        key={drawerKey}
         open={openAdd}
         onClose={() => {
           setOpenAdd(false);
@@ -248,6 +256,7 @@ export default function Products() {
       />
 
       <EditProductDrawer
+        key={drawerKey}
         open={openEdit}
         product={selectedProduct} // FULL PRODUCT
         productId={selectedProduct?.id}

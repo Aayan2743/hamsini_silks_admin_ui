@@ -13,7 +13,7 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // RESPONSE → handle 401 & 422 globally
@@ -21,21 +21,22 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
+    const token = localStorage.getItem("token");
 
-    if (status === 401) {
-      // Token missing / expired
+    // 🔥 Redirect ONLY if token exists (session expired case)
+    if (status === 401 && token) {
       localStorage.removeItem("token");
-      alert(error.response.data.message || "Session expired");
+      localStorage.removeItem("user");
+      alert("Session expired. Please login again.");
       window.location.href = "/login";
     }
 
     if (status === 422) {
-      // Validation error
       alert(error.response.data.message);
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

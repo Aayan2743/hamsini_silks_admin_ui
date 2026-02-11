@@ -293,6 +293,46 @@ const EditStepVariation = forwardRef(
         {loading && <p>Saving variations…</p>}
       </div>
     );
+    // return (
+    //   <div className="bg-white p-6 space-y-8">
+    //     <h3 className="text-lg font-semibold text-gray-800">
+    //       Product Variations
+    //     </h3>
+
+    //     {/* VARIATION SELECTS */}
+    //     <div className="grid gap-4 md:grid-cols-2">
+    //       {variations.map((v) => (
+    //         <EditVariantSelect
+    //           key={v.id}
+    //           label={v.name}
+    //           options={v.values}
+    //           selected={selected[v.id] || []}
+    //           onChange={(vals) =>
+    //             setSelected((p) => ({
+    //               ...p,
+    //               [v.id]: [...vals],
+    //             }))
+    //           }
+    //         />
+    //       ))}
+    //     </div>
+
+    //     {/* TABLE */}
+    //     {labels.length > 0 && (
+    //       <EditVariantTable
+    //         variants={labels}
+    //         data={rows}
+    //         setData={setRows}
+    //         addImages={addImages}
+    //         removeImage={removeImage}
+    //       />
+    //     )}
+
+    //     {loading && (
+    //       <p className="text-sm text-indigo-600">Saving variations…</p>
+    //     )}
+    //   </div>
+    // );
   },
 );
 

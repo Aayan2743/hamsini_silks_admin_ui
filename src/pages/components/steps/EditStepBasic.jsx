@@ -117,6 +117,8 @@ export default function EditStepBasic({ setStep, setProductId, product }) {
     return <div className="py-12 text-center">Loading...</div>;
   }
 
+  const hasSubCategory = form.category_id && subCategories.length > 0;
+
   return (
     <div className="bg-white rounded-xl border shadow-sm p-6 space-y-6">
       <div>
@@ -124,7 +126,7 @@ export default function EditStepBasic({ setStep, setProductId, product }) {
         <p className="text-sm text-gray-500">Update product details</p>
       </div>
 
-      {/* PRODUCT NAME */}
+      {/* PRODUCT NAME - ALWAYS FULL WIDTH */}
       <FormGroup label="Product Name">
         <input
           className="input"
@@ -133,36 +135,34 @@ export default function EditStepBasic({ setStep, setProductId, product }) {
         />
       </FormGroup>
 
-      {/* CATEGORY */}
-      <SearchableSelect
-        label="Category"
-        options={mainCategories}
-        value={form.category_id}
-        onChange={(id) => handleChange("category_id", id)}
-        placeholder="Select category"
-      />
-
-      {/* SUB CATEGORY */}
-      {form.category_id && subCategories.length > 0 && (
+      {/* CATEGORY SECTION (DYNAMIC) */}
+      <div
+        className={`grid gap-6 ${
+          hasSubCategory ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"
+        }`}
+      >
+        {/* CATEGORY */}
         <SearchableSelect
-          label="Sub Category"
-          options={subCategories}
-          value={form.subcategory_id}
-          onChange={(id) => handleChange("subcategory_id", id)}
-          placeholder="Select sub category"
+          label="Category"
+          options={mainCategories}
+          value={form.category_id}
+          onChange={(id) => handleChange("category_id", id)}
+          placeholder="Select category"
         />
-      )}
 
-      {/* BRAND */}
-      <SearchableSelect
-        label="Brand"
-        options={brands}
-        value={form.brand_id}
-        onChange={(id) => handleChange("brand_id", id)}
-        placeholder="Select brand"
-      />
+        {/* SUB CATEGORY */}
+        {hasSubCategory && (
+          <SearchableSelect
+            label="Sub Category"
+            options={subCategories}
+            value={form.subcategory_id}
+            onChange={(id) => handleChange("subcategory_id", id)}
+            placeholder="Select sub category"
+          />
+        )}
+      </div>
 
-      {/* DESCRIPTION */}
+      {/* DESCRIPTION - FULL WIDTH */}
       <FormGroup label="Description">
         <textarea
           rows="3"
@@ -172,8 +172,7 @@ export default function EditStepBasic({ setStep, setProductId, product }) {
         />
       </FormGroup>
 
-      {/* PRICE */}
-
+      {/* UPDATE BUTTON */}
       <button
         onClick={handleSubmit}
         disabled={loading}

@@ -295,6 +295,8 @@ import CustomerCombinedReport from "./pages/CustomerCombinedReport";
 import StaffComponent from "./pages/StaffComponent";
 import StaffAddComponent from "./pages/StaffAddComponent";
 import StaffAttendanceCalendar from "./pages/StaffAttendanceCalendar";
+import ContactSettings from "./pages/settings/components/ContactSettings";
+import CustomerCareSettings from "./pages/settings/components/CustomerCareSettings";
 
 export default function App() {
   return (
@@ -375,6 +377,11 @@ export default function App() {
                 <Route path="profile" element={<ProfileSettings />} />
                 <Route path="logo" element={<LogoSettings />} />
                 <Route path="social-media" element={<SocialMediaSettings />} />
+                <Route path="contact-page" element={<ContactSettings />} />
+                <Route
+                  path="customer-care-settings"
+                  element={<CustomerCareSettings />}
+                />
                 <Route
                   path="payment-gateway"
                   element={<PaymentGatewaySettings />}

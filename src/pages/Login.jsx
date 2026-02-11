@@ -3,15 +3,15 @@ import { useAuth } from "../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useAppSettings } from "../context/AppSettingsContext";
-import { useLogoSettings } from "../context/LogoSettingsContext";
+// import { useLogoSettings } from "../context/LogoSettingsContext";
 import defaultimage from "../assets/profile.jpg";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL_Image_URl;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL_Image_URl1;
 const FALLBACK_LOGO = defaultimage;
 
 export default function Login() {
   const { settings } = useAppSettings();
-  const { settings: logoSettings } = useLogoSettings();
+  // const { logoSettings, getLogoSettings } = useLogoSettings();
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -27,11 +27,19 @@ export default function Login() {
       APPLY LOGO FROM CONTEXT
      (NO API CALL HERE)
   =============================== */
-  useEffect(() => {
-    if (!logoSettings) return;
+  // useEffect(() => {
+  //   if (!logoSettings) return;
 
-    setLogo(logoSettings.app_logo_url || FALLBACK_LOGO);
-  }, [logoSettings]);
+  //   console.log("logo setting", logoSettings);
+  //   setLogo(logoSettings.app_logo_url || FALLBACK_LOGO);
+  // }, [logoSettings]);
+
+  useEffect(() => {
+    console.log(settings);
+    if (settings?.logo && settings.logo.trim() !== "") {
+      setLogo(settings.logo);
+    }
+  }, [settings]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
